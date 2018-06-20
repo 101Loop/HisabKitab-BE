@@ -1,0 +1,10 @@
+{
+    "production": {
+        "aws_region": "ap-south-1",
+        "django_settings": "JyessTrading.settings",
+        "profile_name": "default",
+        "project_name": "jyesstrading-be",
+        "runtime": "python3.6",
+        "s3_bucket": "jyessonline-zappa"
+    }
+}
