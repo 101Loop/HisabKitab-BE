@@ -1,0 +1,3 @@
+[submodule "django_custom_modules"]
+	path = django_custom_modules
+	url = https://github.com/iamhssingh/django_custom_modules.git
