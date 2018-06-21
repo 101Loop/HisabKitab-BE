@@ -81,9 +81,9 @@ JWT_AUTH = {
 
 JWT_AUTH_KEY = 'Authorization'
 
-USE_TZ = True
+USE_TZ = False
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 
 # Static files (CSS, JavaScript, Images)

@@ -5,6 +5,8 @@ from django_custom_modules.data_model import CreateUpdateModel, _
 class TransactionModes(CreateUpdateModel):
     mode = models.CharField(_('Mode of Transfer'), max_length=254, unique=True)
 
+    def __str__(self):
+        return self.mode
 
 class TransactionDetails(CreateUpdateModel):
     from contacts.models import ContactDetails
@@ -14,6 +16,9 @@ class TransactionDetails(CreateUpdateModel):
     # TODO: Put a verification method i.e. Credit: amount >=0 | Debit: amount <=0
     amount = models.IntegerField(default=0)
     mode = models.ForeignKey(TransactionModes, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return str(self.amount) + '|' + str(self.created_by.name)
 
     # def verify(self):
     #     if self.amount >= 0:

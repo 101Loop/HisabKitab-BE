@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from transactions.views import about
 
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
@@ -23,4 +24,5 @@ urlpatterns = [
     url(r'^api/users/', include('users.urls')),
     url(r'^api/transactions/', include('transactions.urls')),
     url(r'^api/contacts/', include('contacts.urls')),
+    url(r'^$', about, name='about'),
 ]
