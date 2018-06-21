@@ -274,24 +274,13 @@ class Register(ValidateAndPerformView):
                                             is_active=False)
             data = {"name": user.get_full_name(), "username": user.get_username(), "id": user.id,
                     'email': user.email, 'mobile': user.mobile}
-            if 'referral' in self.request.data.keys():
-                from referral.models import Referrals, ReferralCode
-                try:
-                    rcode = ReferralCode.objects.get(code=serialized_data.initial_data['referral'])
-                    ref = Referrals()
-                    ref.rcode = rcode
-                    ref.created_by = user
-                    ref.save()
-                    data['referral'] = ref.rcode.code
-                except ReferralCode.DoesNotExist:
-                    data['referral'] = 'Invalid Referral Code'
             status_code = status.HTTP_201_CREATED
             subject = "New account created | Flexy Managers"
-            message = """You've created an account with Flexy Managers.
+            message = """You've created an account with Jyess Trading.
             Your account activation is subject to Administrator approval.
             Our Administrator may call you for verification.
             Thank You! 
-            
+                
             This application has been developed by <B>M/s Civil Machines Technologies Private Limited</B>
             """
             send_message('email', message, subject, user.email)

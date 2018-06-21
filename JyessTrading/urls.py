@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/users/', include('users.urls')),
     url(r'^api/transactions/', include('transactions.urls')),
+    url(r'^api/contacts/', include('contacts.urls')),
 ]

@@ -14,7 +14,7 @@ class TransactionDetails(CreateUpdateModel):
     # TODO: Put a verification method i.e. Credit: amount >=0 | Debit: amount <=0
     amount = models.IntegerField(default=0)
     mode = models.ForeignKey(TransactionModes, on_delete=models.PROTECT)
-    #
+
     # def verify(self):
     #     if self.amount >= 0:
     #         self.category = 'Credit'

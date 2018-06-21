@@ -4,15 +4,15 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from django_custom_modules.serializer import IsOwnerFilterBackend
 
 
-class ShowAmount(ListAPIView):
+class ShowTransactionAmount(ListAPIView):
     from .serializers import ShowTransactionDetailsSerializer
 
     queryset = TransactionDetails.objects.all()
     serializer_class = ShowTransactionDetailsSerializer
-    filter_backends = IsOwnerFilterBackend
+    filter_backends = (IsOwnerFilterBackend, )
 
 
-class AddAmount(CreateAPIView):
+class AddTransactionAmount(CreateAPIView):
     from .serializers import AddTransactionDetailsSerializer
 
     serializer_class = AddTransactionDetailsSerializer
@@ -24,3 +24,10 @@ class AddAmount(CreateAPIView):
                                                            created_by=self.request.user)
         serializer.validated_data['contact'] = contact_obj
         serializer.save(created_by=self.request.user)
+
+class ShowMode(ListAPIView):
+    from .serializers import ShowModeSerializer
+    from .models import TransactionModes
+
+    queryset = TransactionModes.objects.all()
+    serializer_class = ShowModeSerializer

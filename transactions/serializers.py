@@ -1,6 +1,15 @@
 from rest_framework import serializers
 
 
+class ShowModeSerializer(serializers.ModelSerializer):
+    class Meta:
+        from .models import TransactionModes
+
+        model = TransactionModes
+        fields = ('id', 'mode')
+        read_only_fields = ('id', 'mode')
+
+
 class AddTransactionDetailsSerializer(serializers.ModelSerializer):
     contact = serializers.CharField(required=True, max_length=254)
 
@@ -12,6 +21,7 @@ class AddTransactionDetailsSerializer(serializers.ModelSerializer):
 
 
 class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
+    mode = ShowModeSerializer(many=False)
 
     class Meta:
         from .models import TransactionDetails
