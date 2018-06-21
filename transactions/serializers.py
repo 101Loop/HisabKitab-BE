@@ -21,7 +21,10 @@ class AddTransactionDetailsSerializer(serializers.ModelSerializer):
 
 
 class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
+    from contacts.serializers import ShowContactDetailSerializer
+
     mode = ShowModeSerializer(many=False)
+    name = ShowContactDetailSerializer(many=False)
 
     class Meta:
         from .models import TransactionDetails

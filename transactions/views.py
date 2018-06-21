@@ -1,6 +1,5 @@
 from .models import TransactionDetails
 from rest_framework.generics import ListAPIView, CreateAPIView
-from django_custom_modules.serializer import IsOwnerFilterBackend
 
 
 class ShowTransactionAmount(ListAPIView):
@@ -9,7 +8,7 @@ class ShowTransactionAmount(ListAPIView):
 
     queryset = TransactionDetails.objects.all()
     serializer_class = ShowTransactionDetailsSerializer
-    filter_backends = (IsOwnerFilterBackend, )
+    filter_fields = ('category',)
 
 
 class AddTransactionAmount(CreateAPIView):
@@ -32,10 +31,12 @@ class ShowMode(ListAPIView):
 
     from .serializers import ShowModeSerializer
     from .models import TransactionModes
+    from rest_framework.permissions import AllowAny
 
-
+    permission_classes = (AllowAny, )
     queryset = TransactionModes.objects.all()
     serializer_class = ShowModeSerializer
+    filter_backends = ()
 
 
 def about(request):
@@ -45,4 +46,3 @@ def about(request):
 
     return render(request, 'transactions/about.html')
 
-# class IncomingAmount():

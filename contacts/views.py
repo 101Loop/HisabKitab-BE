@@ -1,19 +1,21 @@
-
-from rest_framework  import generics
+from rest_framework.generics import ListAPIView, CreateAPIView
 from .models import ContactDetails
-from .serializers import ContactDetailSerializer
-from rest_framework.response import Response
+from .serializers import ShowContactDetailSerializer
 
 
-class Contact(generics.ListCreateAPIView):
+class ShowContacts(ListAPIView):
 
-    def list(self, request):
-        queryset = ContactDetails.objects.all()
-        serializer = ContactDetailSerializer(queryset, many=True)
-        return Response(serializer.data)
+    queryset = ContactDetails.objects.all()
+    serializer_class = ShowContactDetailSerializer
 
-    def post(self, request):
-        serializer = ContactDetailSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+    # def post(self, request):
+    #     serializer = ContactDetailSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data)
+#
+#
+# class AddContacts(CreateAPIView):
+#
+#     serializer_class = ContactDetailSerializer
+
