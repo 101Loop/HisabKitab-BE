@@ -8,6 +8,7 @@ class TransactionModes(CreateUpdateModel):
     def __str__(self):
         return self.mode
 
+
 class TransactionDetails(CreateUpdateModel):
     from contacts.models import ContactDetails
 
@@ -26,4 +27,3 @@ class TransactionDetails(CreateUpdateModel):
     #
     #     else:
     #         self.category = 'Debit'
-

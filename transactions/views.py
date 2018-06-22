@@ -20,9 +20,8 @@ class AddTransactionAmount(CreateAPIView):
 
         from contacts.models import ContactDetails
 
-
         contact_obj, created = ContactDetails.objects.get_or_create(name=serializer.validated_data['contact'],
-                                                           created_by=self.request.user)
+                                                                    created_by=self.request.user)
         serializer.validated_data['contact'] = contact_obj
         serializer.save(created_by=self.request.user)
 
@@ -43,6 +42,4 @@ def about(request):
 
     from django.shortcuts import render
 
-
     return render(request, 'transactions/about.html')
-
