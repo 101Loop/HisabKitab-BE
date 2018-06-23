@@ -4,6 +4,9 @@ from django.utils.text import gettext_lazy as _
 
 
 class ContactDetails(CreateUpdateModel):
+    """
+    A custom ContactDetails model that keeps a record of all the details of a contact.
+    """
     name = models.CharField(_('Unique UserName'), max_length=254)
     email = models.EmailField(_('Email Address'), null=True)
     mobile = models.CharField(_('Mobile Number'), max_length=15, null=True)
@@ -42,6 +45,9 @@ class ContactDetails(CreateUpdateModel):
                 return email_user
 
     def __str__(self):
+        """
+        Returns string representation of the name.
+        """
         return self.name
 
     class Meta:
