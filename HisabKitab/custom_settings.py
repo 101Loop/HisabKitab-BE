@@ -13,8 +13,8 @@ CUSTOM_MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = (
-    'jyessonline.firebaseapp.com',
-    'localhost:4200',
+    'hisabkitabin.firebaseapp.com',
+    'hisabkitab.in',
 )
 
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
@@ -129,4 +129,3 @@ JET_THEMES = [
         'title': 'Light Gray'
     }
 ]
-
