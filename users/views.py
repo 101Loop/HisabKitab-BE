@@ -270,7 +270,6 @@ class Register(ValidateAndPerformView):
                                             name=serialized_data.initial_data['name'],
                                             password=serialized_data.initial_data['password'],
                                             mobile=serialized_data.initial_data['mobile'],
-                                            organization=serialized_data.initial_data['organization'],
                                             is_active=False)
             data = {"name": user.get_full_name(), "username": user.get_username(), "id": user.id,
                     'email': user.email, 'mobile': user.mobile}

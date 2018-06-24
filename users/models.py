@@ -20,7 +20,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = cmodels.UnixTimestampField(_('Date Joined'), auto_now_add=True)
     last_modified = cmodels.UnixTimestampField(_('Date Modified'), auto_created=True)
     is_active = models.BooleanField(_('Activated'), default=False)
-    organization = models.CharField(_('Organization'), max_length=500, null=False, blank=False)
 
     objects = UserManager()
 
@@ -38,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.name
 
     def __str__(self):
-        return self.name + ' | ' + self.username + ' | ' + str(self.organization)
+        return self.name + ' | ' + self.username
 
     @property
     def is_staff(self):
