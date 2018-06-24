@@ -105,3 +105,6 @@ venv.bak/
 
 # Ignore .idea
 .idea/
+
+# Ignore static folder
+static/
