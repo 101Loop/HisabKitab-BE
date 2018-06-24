@@ -12,7 +12,7 @@ ALLOWED_HOSTS = []
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'JyessTradingDB',
+        'NAME': 'HisabKitabDB',
         'USER': '---',
         'PASSWORD': '---',
     }

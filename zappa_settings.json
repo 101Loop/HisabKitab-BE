@@ -1,7 +1,7 @@
 {
     "production": {
         "aws_region": "ap-south-1",
-        "django_settings": "JyessTrading.settings",
+        "django_settings": "HisabKitab.settings",
         "profile_name": "default",
         "project_name": "jyesstrading-be",
         "runtime": "python3.6",
