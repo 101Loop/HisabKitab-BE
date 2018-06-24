@@ -274,13 +274,15 @@ class Register(ValidateAndPerformView):
             data = {"name": user.get_full_name(), "username": user.get_username(), "id": user.id,
                     'email': user.email, 'mobile': user.mobile}
             status_code = status.HTTP_201_CREATED
-            subject = "New account created | Flexy Managers"
-            message = """You've created an account with Jyess Trading.
+            subject = "New account created | Hisab Kitab (v 0.1 b1)"
+            message = """You've created an account with Hisab Kitab.
             Your account activation is subject to Administrator approval.
             Our Administrator may call you for verification.
+            
+            This app is a product of Vitartha, a StartUp focusing on Financially aware India.
+            Vitartha will also like to thank M/s Civil Machines Technologies Private Limited for the technical 
+            production & development of this app. 
             Thank You! 
-                
-            This application has been developed by <B>M/s Civil Machines Technologies Private Limited</B>
             """
             send_message('email', message, subject, user.email)
         else:
