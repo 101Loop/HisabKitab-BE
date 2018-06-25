@@ -21,17 +21,11 @@ class TransactionDetails(CreateUpdateModel):
     from contacts.models import ContactDetails
 
     contact = models.ForeignKey(ContactDetails, on_delete=models.PROTECT)
-    category = models.CharField(choices=[('C', 'Credit'), ('D', 'Debit')], max_length=8)
-    # TODO: Put a verification method i.e. Credit: amount >=0 | Debit: amount <=0
+    category = models.CharField(choices=[('C', 'Credit'), ('D', 'Debit')], max_length=6)
+    transaction_date = models.DateTimeField()
     amount = models.IntegerField(null=False, blank=False)
     mode = models.ForeignKey(TransactionModes, on_delete=models.PROTECT)
 
     def __str__(self):
         return str(self.amount) + '|' + str(self.created_by.name)
 
-    # def verify(self):
-    #     if self.amount >= 0:
-    #         self.category = 'Credit'
-    #
-    #     else:
-    #         self.category = 'Debit'
