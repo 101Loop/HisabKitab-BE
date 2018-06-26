@@ -48,7 +48,8 @@ REST_FRAMEWORK = {
 
     'DEFAULT_FILTER_BACKENDS': (
         'django_custom_modules.serializer.IsOwnerFilterBackend',
-        'django_filters.rest_framework.DjangoFilterBackend')
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ),
 }
 
 AUTH_USER_MODEL = 'users.User'

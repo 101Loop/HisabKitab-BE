@@ -36,7 +36,7 @@ class AddTransactionDetailsSerializer(serializers.ModelSerializer):
         from .models import TransactionDetails
 
         model = TransactionDetails
-        fields = ('category', 'amount', 'mode', 'contact', 'transaction_date')
+        fields = ('category', 'amount', 'mode', 'contact', 'transaction_date', 'comments')
 
 
 class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
@@ -47,6 +47,7 @@ class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
 
     mode = ShowModeSerializer(many=False)
     contact = ShowContactDetailSerializer(many=False)
+    transaction_date = serializers.DateField()
 
     class Meta:
         from .models import TransactionDetails

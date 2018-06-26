@@ -18,7 +18,7 @@ class ShowTransactionAmount(ListAPIView):
     # TODO: Check how to send multiple value (cash & cheque)
     # TODO: Fix pagination error: Define Ordering parameter
     # TODO: Implement ordering (Sorting)
-    filter_fields = ('category', 'mode')
+    filter_fields = ('category', 'mode', 'id')
     search_fields = ('^contact__name', )
 
 
@@ -27,8 +27,10 @@ class AddTransactionAmount(CreateAPIView):
     This view is to add new transactions.
     """
     from .serializers import AddTransactionDetailsSerializer
+    from rest_framework.parsers import JSONParser
 
     serializer_class = AddTransactionDetailsSerializer
+    parser_classes = (JSONParser,)
 
     def perform_create(self, serializer):
 

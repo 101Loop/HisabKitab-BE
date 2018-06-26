@@ -21,11 +21,11 @@ class TransactionDetails(CreateUpdateModel):
     from contacts.models import ContactDetails
 
     contact = models.ForeignKey(ContactDetails, on_delete=models.PROTECT)
-    category = models.CharField(choices=[('C', 'Credit'), ('D', 'Debit')], max_length=6)
-    transaction_date = models.DateField()
-    amount = models.FloatField(null=False, blank=False)
+    category = models.CharField(_('Category'), choices=[('C', 'Credit'), ('D', 'Debit')], max_length=6)
+    transaction_date = models.DateField(_('Transaction Date'))
+    amount = models.FloatField(_('Amount'), null=False, blank=False)
     mode = models.ForeignKey(TransactionModes, on_delete=models.PROTECT)
+    comments = models.TextField(_('Comments'), null=True, blank=True)
 
     def __str__(self):
         return str(self.amount) + '|' + str(self.created_by.name)
-
