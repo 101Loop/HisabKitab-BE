@@ -1,4 +1,5 @@
 from django.contrib import admin
+from .models import ContactDetails
 
 
 class MyModelAdmin(admin.ModelAdmin):
@@ -7,3 +8,6 @@ class MyModelAdmin(admin.ModelAdmin):
         if obj:
             return None
         return 'created_by'
+
+
+admin.site.register(ContactDetails, MyModelAdmin)

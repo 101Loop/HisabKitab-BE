@@ -7,21 +7,30 @@ class ShowContacts(ListAPIView):
     """
     This view is to show the details of a contact.
     """
+    from .serializers import ShowContactDetailSerializer
 
     queryset = ContactDetails.objects.all()
     serializer_class = ShowContactDetailSerializer
 
 
-# class AddContacts(CreateAPIView):
+class AddContacts(CreateAPIView):
+    """
+    This view is to add new contacts.
+    """
+    from .serializers import AddContactDetailSerializer
 
-    # def post(self, request):
-    #     serializer = ContactDetailSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-#
-#
-# class AddContacts(CreateAPIView):
-#
-#     serializer_class = ContactDetailSerializer
+    serializer_class = AddContactDetailSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+#
+#     def post(self, request):
+#
+#         from .serializers import AddContactDetailSerializer
+#         from django.http import JsonResponse
+#
+#         serializer = AddContactDetailSerializer(data = self.request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse(serializer.data)
+#         return JsonResponse(serializer.errors)

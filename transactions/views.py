@@ -7,15 +7,19 @@ class ShowTransactionAmount(ListAPIView):
     This view is to show the details of transactions.
     """
     from .serializers import ShowTransactionDetailsSerializer
-
+    from django_custom_modules.serializer import IsOwnerFilterBackend
+    from django_filters.rest_framework import DjangoFilterBackend, MultipleChoiceFilter
+    from rest_framework.filters import SearchFilter
 
     queryset = TransactionDetails.objects.all()
     serializer_class = ShowTransactionDetailsSerializer
+    filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter)
     # TODO: Check how to send range
     # TODO: Check how to send multiple value (cash & cheque)
     # TODO: Fix pagination error: Define Ordering parameter
     # TODO: Implement ordering (Sorting)
     filter_fields = ('category', 'mode')
+    search_fields = ('^contact__name', )
 
 
 class AddTransactionAmount(CreateAPIView):

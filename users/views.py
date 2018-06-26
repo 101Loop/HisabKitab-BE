@@ -270,7 +270,7 @@ class Register(ValidateAndPerformView):
                                             name=serialized_data.initial_data['name'],
                                             password=serialized_data.initial_data['password'],
                                             mobile=serialized_data.initial_data['mobile'],
-                                            is_active=False)
+                                            is_active=True)
             data = {"name": user.get_full_name(), "username": user.get_username(), "id": user.id,
                     'email': user.email, 'mobile': user.mobile}
             status_code = status.HTTP_201_CREATED

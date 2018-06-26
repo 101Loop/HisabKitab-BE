@@ -19,5 +19,17 @@ class ShowContactDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'email', 'mobile')
 
 
-# class AddContactDetailSerializer(serializers.ModelSerializer):
+class AddContactDetailSerializer(serializers.ModelSerializer):
+    """
+    AddContactDetailSerializer is a model serializer that includes the fields required for adding a new contact.
+    Returns
+    -------
+        returns a dictionary containing::
+            'name' : str
+            'email' : str
+            'mobile' : str
+    """
 
+    class Meta:
+        model = ContactDetails
+        fields = ('name', 'email', 'mobile')
