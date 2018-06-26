@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import TransactionDetails
 
 
 class ShowModeSerializer(serializers.ModelSerializer):
@@ -29,12 +30,11 @@ class AddTransactionDetailsSerializer(serializers.ModelSerializer):
             'mode' : str
             'contact' : str
             'transaction_date' : date
+            'comments' : str
     """
     contact = serializers.CharField(required=True, max_length=254)
 
     class Meta:
-        from .models import TransactionDetails
-
         model = TransactionDetails
         fields = ('category', 'amount', 'mode', 'contact', 'transaction_date', 'comments')
 
@@ -50,7 +50,21 @@ class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
     transaction_date = serializers.DateField()
 
     class Meta:
-        from .models import TransactionDetails
-
         model = TransactionDetails
         fields = '__all__'
+
+
+class DeleteTransactionDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TransactionDetails
+        fields = ('id',)
+
+
+class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
+    contact = serializers.CharField(required=True, max_length=254)
+
+    class Meta:
+        model = TransactionDetails
+        fields = ('id', 'category', 'amount', 'mode', 'contact', 'transaction_date', 'comments')
+
