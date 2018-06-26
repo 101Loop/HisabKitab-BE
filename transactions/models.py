@@ -22,8 +22,8 @@ class TransactionDetails(CreateUpdateModel):
 
     contact = models.ForeignKey(ContactDetails, on_delete=models.PROTECT)
     category = models.CharField(choices=[('C', 'Credit'), ('D', 'Debit')], max_length=6)
-    transaction_date = models.DateTimeField()
-    amount = models.IntegerField(null=False, blank=False)
+    transaction_date = models.DateField()
+    amount = models.FloatField(null=False, blank=False)
     mode = models.ForeignKey(TransactionModes, on_delete=models.PROTECT)
 
     def __str__(self):
