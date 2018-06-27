@@ -6,7 +6,14 @@ class ShowModeSerializer(serializers.ModelSerializer):
     """
     ShowModeSerializer is a model serializer that shows the modes of transaction.
     Returns
-    -------
+    -------def create(self, request, *args, **kwargs):
+        from rest_framework import status
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer = self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         returns a dictionary containing::
             'id' : int
             'mode' : str
@@ -55,6 +62,9 @@ class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
 
 
 class DeleteTransactionDetailsSerializer(serializers.ModelSerializer):
+    """
+    It is a model serializer to delete a particular transaction.
+    """
 
     class Meta:
         model = TransactionDetails
@@ -62,6 +72,9 @@ class DeleteTransactionDetailsSerializer(serializers.ModelSerializer):
 
 
 class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
+    """
+    It is a model serializer to update a particular serializer.
+    """
     contact = serializers.CharField(required=True, max_length=254)
 
     class Meta:

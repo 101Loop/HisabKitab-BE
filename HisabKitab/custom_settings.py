@@ -94,7 +94,7 @@ TIME_ZONE = 'Asia/Kolkata'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = '/production/static/'
+STATIC_URL = '/static/'
 
 STATIC_ROOT = 'static'
 
