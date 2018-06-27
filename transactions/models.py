@@ -12,6 +12,10 @@ class TransactionModes(CreateUpdateModel):
     def __str__(self):
         return self.mode
 
+    class Meta:
+        verbose_name = _('Transaction Mode')
+        verbose_name_plural = _('Transaction Modes')
+
 
 class TransactionDetails(CreateUpdateModel):
     """
@@ -29,3 +33,7 @@ class TransactionDetails(CreateUpdateModel):
 
     def __str__(self):
         return str(self.amount) + '|' + str(self.created_by.name)
+
+    class Meta:
+        verbose_name = _('Transaction Detail')
+        verbose_name_plural = _('Transaction Details')

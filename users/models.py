@@ -43,6 +43,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return self.is_superuser
 
+    class Meta:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
+
 
 class AuthTransaction(models.Model):
     """
@@ -56,6 +60,10 @@ class AuthTransaction(models.Model):
 
     def __str__(self):
         return self.user.name + ' | ' + self.user.username
+
+    class Meta:
+        verbose_name = _('Auth Transaction')
+        verbose_name_plural = _('Auth Transactions')
 
 
 class OTPValidation(models.Model):
@@ -76,3 +84,8 @@ class OTPValidation(models.Model):
 
     def __str__(self):
         return self.destination
+
+    class Meta:
+        verbose_name = _('OTP Validation')
+        verbose_name_plural = _('OTP Validations')
+
