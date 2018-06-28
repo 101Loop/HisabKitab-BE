@@ -1,5 +1,6 @@
 from .models import TransactionDetails
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.response import Response
 
 
 class ShowTransactionAmount(ListAPIView):
@@ -9,19 +10,33 @@ class ShowTransactionAmount(ListAPIView):
     from .serializers import ShowTransactionDetailsSerializer
     from django_custom_modules.serializer import IsOwnerFilterBackend
     from django_filters.rest_framework import DjangoFilterBackend, MultipleChoiceFilter
-    from rest_framework.filters import SearchFilter
-
+    from rest_framework.filters import SearchFilter, OrderingFilter
 
     queryset = TransactionDetails.objects.all().order_by('contact_id')
     serializer_class = ShowTransactionDetailsSerializer
-    filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter)
+    filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter, OrderingFilter)
     # TODO: Check how to send range
     # TODO: Check how to send multiple value (cash & cheque)
-    # TODO: Fix pagination error: Define Ordering parameter
     # TODO: Implement ordering (Sorting)
 
     filter_fields = ('category', 'mode', 'id', 'transaction_date')
     search_fields = ('^contact__name', )
+
+    def list(self, request, *args, **kwargs):
+        from django.db.models import Sum
+
+        queryset = self.filter_queryset(self.get_queryset())
+        total = queryset.aggregate(Sum('amount'))
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated_response = self.get_paginated_response(serializer.data)
+            paginated_response.data['total_amount'] = total['amount__sum']
+            return paginated_response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class AddTransactionAmount(CreateAPIView):
@@ -52,7 +67,7 @@ class DeleteTransactionAmount(DestroyAPIView):
 
     queryset = TransactionDetails.objects.all()
     serializer_class = DeleteTransactionDetailsSerializer
-    lookup_field = 'pk'
+    lookup_field = 'id'
 
 
 class UpdateTransactionAmount(UpdateAPIView):
