@@ -11,14 +11,16 @@ class ShowTransactionAmount(ListAPIView):
     from django_filters.rest_framework import DjangoFilterBackend, MultipleChoiceFilter
     from rest_framework.filters import SearchFilter
 
-    queryset = TransactionDetails.objects.all()
+
+    queryset = TransactionDetails.objects.all().order_by('contact_id')
     serializer_class = ShowTransactionDetailsSerializer
     filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter)
     # TODO: Check how to send range
     # TODO: Check how to send multiple value (cash & cheque)
     # TODO: Fix pagination error: Define Ordering parameter
     # TODO: Implement ordering (Sorting)
-    filter_fields = ('category', 'mode', 'id')
+
+    filter_fields = ('category', 'mode', 'id', 'transaction_date')
     search_fields = ('^contact__name', )
 
 
@@ -50,6 +52,7 @@ class DeleteTransactionAmount(DestroyAPIView):
 
     queryset = TransactionDetails.objects.all()
     serializer_class = DeleteTransactionDetailsSerializer
+    lookup_field = 'pk'
 
 
 class UpdateTransactionAmount(UpdateAPIView):
@@ -60,6 +63,7 @@ class UpdateTransactionAmount(UpdateAPIView):
 
     queryset = TransactionDetails.objects.all()
     serializer_class = UpdateTransactionDetailsSerializer
+
 
     def perform_update(self, serializer):
 
