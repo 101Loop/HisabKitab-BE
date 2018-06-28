@@ -17,10 +17,10 @@ class ShowTransactionAmount(ListAPIView):
     filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter, OrderingFilter)
     # TODO: Check how to send range
     # TODO: Check how to send multiple value (cash & cheque)
-    # TODO: Implement ordering (Sorting)
 
     filter_fields = ('category', 'mode', 'id', 'transaction_date')
     search_fields = ('^contact__name', )
+    ordering_fields = ('contact__name', 'amount', 'transaction_date')
 
     def list(self, request, *args, **kwargs):
         from django.db.models import Sum
@@ -78,7 +78,6 @@ class UpdateTransactionAmount(UpdateAPIView):
 
     queryset = TransactionDetails.objects.all()
     serializer_class = UpdateTransactionDetailsSerializer
-
 
     def perform_update(self, serializer):
 
