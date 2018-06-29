@@ -11,9 +11,9 @@ urlpatterns = [
     path('show/', views.ShowTransactionAmount.as_view(), name='Show-Transactions-Amount'),
     # ex: api/transactions/mode/show/
     path('mode/show/', views.ShowMode.as_view(), name='Show-Mode'),
-    # ex: api/transactions/delete/
+    # ex: api/transactions/pk/delete/
     path('<int:pk>/delete/', views.DeleteTransactionAmount.as_view(), name='Delete-Transaction-Amount'),
-    # ex: api/transactions/update/
+    # ex: api/transactions/pk/update/
     path('<int:pk>/update/', views.UpdateTransactionAmount.as_view(), name='Update-Transaction-Amount'),
 
 ]

@@ -67,7 +67,6 @@ class DeleteTransactionAmount(DestroyAPIView):
 
     queryset = TransactionDetails.objects.all()
     serializer_class = DeleteTransactionDetailsSerializer
-    lookup_field = 'id'
 
 
 class UpdateTransactionAmount(UpdateAPIView):
