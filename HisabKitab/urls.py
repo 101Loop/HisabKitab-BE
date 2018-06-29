@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from transactions.views import about
 
+
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
@@ -25,4 +26,5 @@ urlpatterns = [
     url(r'^api/transactions/', include('transactions.urls')),
     url(r'^api/contacts/', include('contacts.urls')),
     url(r'^$', about, name='about'),
+    url(r'^api/feedback/', include('feedback.urls')),
 ]
