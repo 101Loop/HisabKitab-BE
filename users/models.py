@@ -43,10 +43,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return self.is_superuser
 
-    class Meta:
-        verbose_name = _('User')
-        verbose_name_plural = _('Users')
-
 
 class AuthTransaction(models.Model):
     """

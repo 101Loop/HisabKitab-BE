@@ -18,7 +18,7 @@ class ShowTransactionAmount(ListAPIView):
     # TODO: Check how to send range
     # TODO: Check how to send multiple value (cash & cheque)
 
-    filter_fields = ('category', 'mode', 'id', 'transaction_date')
+    filter_fields = ('category', 'mode', 'id', 'transaction_date', 'amount')
     search_fields = ('^contact__name', )
     ordering_fields = ('contact__name', 'amount', 'transaction_date')
 

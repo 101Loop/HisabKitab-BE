@@ -54,5 +54,3 @@ class ContactDetails(CreateUpdateModel):
         unique_together = ('created_by', 'name')
         verbose_name = _('Contact Detail')
         verbose_name_plural = _('Contact Details')
-
-
