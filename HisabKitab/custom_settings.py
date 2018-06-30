@@ -7,7 +7,16 @@ CUSTOM_APPS = [
     'transactions.apps.TransactionsConfig',
     'corsheaders',
     'feedback.apps.FeedbackConfig',
+    'fcm_notification.apps.FcmNotificationConfig',
 ]
+
+# FCM_DJANGO_SETTINGS = {
+#         "FCM_SERVER_KEY": "[your api key]"
+# }
+#
+# from push_notifications.models import GCMDevice
+# devices = GCMDevice.objects.filter(registration_id=)
+# devices.send_message("Happy name day!")
 
 CUSTOM_MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware'
