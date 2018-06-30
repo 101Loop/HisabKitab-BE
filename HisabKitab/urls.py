@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^api/contacts/', include('contacts.urls')),
     url(r'^$', about, name='about'),
     url(r'^api/feedback/', include('feedback.urls')),
+    url(r'^api/token/', include('fcm_notification.urls')),
 ]

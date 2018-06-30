@@ -54,7 +54,7 @@ class AddTransactionAmount(CreateAPIView):
         from contacts.models import ContactDetails
 
         contact_obj, create = ContactDetails.objects.get_or_create(name=serializer.validated_data['contact'],
-                                                                    created_by=self.request.user)
+                                                                   created_by=self.request.user)
         serializer.validated_data['contact'] = contact_obj
         serializer.save(created_by=self.request.user)
 
@@ -63,8 +63,10 @@ class DeleteTransactionAmount(DestroyAPIView):
     """
     This view is to delete a transaction.
     """
+    from django_custom_modules.serializer import IsOwnerFilterBackend
     from .serializers import DeleteTransactionDetailsSerializer
 
+    filter_backends = (IsOwnerFilterBackend, )
     queryset = TransactionDetails.objects.all()
     serializer_class = DeleteTransactionDetailsSerializer
 
@@ -74,17 +76,20 @@ class UpdateTransactionAmount(UpdateAPIView):
     This view is to update a transaction.
     """
     from .serializers import UpdateTransactionDetailsSerializer
+    from django_custom_modules.serializer import IsOwnerFilterBackend
 
     queryset = TransactionDetails.objects.all()
     serializer_class = UpdateTransactionDetailsSerializer
+    filter_backends = (IsOwnerFilterBackend, )
 
     def perform_update(self, serializer):
-
         from contacts.models import ContactDetails
 
-        contact_obj, created = ContactDetails.objects.get_or_create(name=serializer.validated_data['contact'],
-                                                                    created_by=self.request.user)
-        serializer.validated_data['contact'] = contact_obj
+        if 'contact' in serializer.initial_data.keys():
+            contact_obj, created = ContactDetails.objects.get_or_create(name=serializer.validated_data['contact'],
+                                                                        created_by=self.request.user)
+            serializer.validated_data['contact'] = contact_obj
+
         serializer.save(created_by=self.request.user)
 
 

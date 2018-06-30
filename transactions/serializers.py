@@ -68,9 +68,15 @@ class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
     """
     It is a model serializer to update a particular serializer.
     """
-    contact = serializers.CharField(required=True, max_length=254)
+    from .models import TransactionModes
+
+    contact = serializers.CharField(required=False, max_length=254)
+    transaction_date = serializers.DateField(required=False)
+    amount = serializers.FloatField(required=False)
+    category = serializers.CharField(required=False)
+    mode = serializers.PrimaryKeyRelatedField(required=False, queryset=TransactionModes.objects.all())
 
     class Meta:
         model = TransactionDetails
-        fields = ('id', 'category', 'amount', 'mode', 'contact', 'transaction_date', 'comments')
-
+        fields = ('mode', 'amount', 'transaction_date', 'contact', 'category', 'comments')
+        read_only_fields = ('created_by', 'create_date', 'last_modified')
