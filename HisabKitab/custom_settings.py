@@ -33,6 +33,8 @@ CORS_ALLOW_METHODS = (
     'GET',
     'OPTIONS',
     'POST',
+    'PUT',
+    'DELETE',
 )
 
 AUTHENTICATION_BACKENDS = ['users.auth.MultiFieldModelBackend']
