@@ -21,7 +21,8 @@ class ShowModeSerializer(serializers.ModelSerializer):
 
 class AddTransactionDetailsSerializer(serializers.ModelSerializer):
     """
-    AddTransactionDetailsSerializer is a model serializer that includes the attributes required for creating a new transaction.
+    AddTransactionDetailsSerializer is a model serializer
+                            that includes the attributes required for creating a new transaction.
     Returns
     -------
         returns a dictionary containing::

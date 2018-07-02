@@ -9,18 +9,21 @@ class ShowTransactionAmount(ListAPIView):
     """
     from .serializers import ShowTransactionDetailsSerializer
     from django_custom_modules.serializer import IsOwnerFilterBackend
-    from django_filters.rest_framework import DjangoFilterBackend, MultipleChoiceFilter
+    from django_filters.rest_framework import DjangoFilterBackend
     from rest_framework.filters import SearchFilter, OrderingFilter
+    from .filters import RangeFiltering
 
     queryset = TransactionDetails.objects.all().order_by('contact_id')
     serializer_class = ShowTransactionDetailsSerializer
     filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter, OrderingFilter)
-    # TODO: Check how to send range
+
     # TODO: Check how to send multiple value (cash & cheque)
 
+    filter_class = RangeFiltering
     filter_fields = ('category', 'mode', 'id', 'transaction_date', 'amount')
     search_fields = ('^contact__name', )
     ordering_fields = ('contact__name', 'amount', 'transaction_date')
+
 
     def list(self, request, *args, **kwargs):
         from django.db.models import Sum
