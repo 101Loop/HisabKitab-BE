@@ -67,7 +67,7 @@ class DeleteTransactionDetailsSerializer(serializers.ModelSerializer):
 
 class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
     """
-    It is a model serializer to update a particular serializer.
+    It is a model serializer to update a particular transaction.
     """
     from .models import TransactionModes
 

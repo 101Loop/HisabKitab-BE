@@ -17,10 +17,7 @@ class ShowTransactionAmount(ListAPIView):
     serializer_class = ShowTransactionDetailsSerializer
     filter_backends = (IsOwnerFilterBackend, DjangoFilterBackend, SearchFilter, OrderingFilter)
 
-    # TODO: Check how to send multiple value (cash & cheque)
-
     filter_class = RangeFiltering
-    filter_fields = ('category', 'mode', 'id', 'transaction_date', 'amount')
     search_fields = ('^contact__name', )
     ordering_fields = ('contact__name', 'amount', 'transaction_date')
 
