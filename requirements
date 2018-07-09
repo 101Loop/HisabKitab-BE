@@ -39,3 +39,4 @@ urllib3==1.23
 Werkzeug==0.14.1
 wsgi-request-logger==0.4.6
 zappa==0.46.1
+django-rest-framework-social-oauth2

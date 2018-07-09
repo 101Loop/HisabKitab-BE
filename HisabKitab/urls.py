@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^$', about, name='about'),
     url(r'^api/feedback/', include('feedback.urls')),
     url(r'^api/token/', include('fcm_notification.urls')),
+    url(r'^auth/', include('rest_framework_social_oauth2.urls')),
 ]

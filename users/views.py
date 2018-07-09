@@ -441,13 +441,3 @@ class LoginOTP(ValidateAndPerformView):
                     data, status_code = login_user(user, self.request)
 
         return data, status_code
-
-
-def about(request):
-    """
-    This function is used to set the about page.
-    """
-    from django.shortcuts import render
-
-
-    return render(request, 'flexyusers/about.html')
