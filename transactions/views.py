@@ -21,7 +21,6 @@ class ShowTransactionAmount(ListAPIView):
     search_fields = ('^contact__name', )
     ordering_fields = ('contact__name', 'amount', 'transaction_date')
 
-
     def list(self, request, *args, **kwargs):
         from django.db.models import Sum
 
