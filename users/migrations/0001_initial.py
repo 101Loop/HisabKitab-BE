@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import django_custom_modules.db_type
+import drfaddons.datatypes
 import users.managers
 
 
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name='User',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_modified', django_custom_modules.db_type.UnixTimestampField(auto_created=True)),
+                ('last_modified', drfaddons.datatypes.UnixTimestampField(auto_created=True)),
                 ('password', models.CharField(max_length=128, verbose_name='password')),
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
                 ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('email', models.EmailField(max_length=254, unique=True, verbose_name='EMail Address')),
                 ('mobile', models.CharField(max_length=150, unique=True, verbose_name='Mobile Number')),
                 ('name', models.CharField(max_length=500, verbose_name='Full Name')),
-                ('date_joined', django_custom_modules.db_type.UnixTimestampField(auto_now_add=True)),
+                ('date_joined', drfaddons.datatypes.UnixTimestampField(auto_now_add=True)),
                 ('is_active', models.BooleanField(default=False, verbose_name='Activated')),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
             name='AuthTransaction',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', django_custom_modules.db_type.UnixTimestampField(auto_created=True)),
+                ('date_created', drfaddons.datatypes.UnixTimestampField(auto_created=True)),
                 ('ip_address', models.GenericIPAddressField()),
                 ('token', models.TextField(verbose_name='JWT Token passed')),
                 ('session', models.TextField(verbose_name='Session Passed')),
@@ -60,16 +60,16 @@ class Migration(migrations.Migration):
             name='OTPValidation',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('last_modified', django_custom_modules.db_type.UnixTimestampField(auto_created=True)),
+                ('last_modified', drfaddons.datatypes.UnixTimestampField(auto_created=True)),
                 ('otp', models.CharField(max_length=10, unique=True, verbose_name='OTP Code')),
                 ('destination', models.CharField(max_length=254, unique=True, verbose_name='Destination Address (Mobile/EMail)')),
-                ('create_date', django_custom_modules.db_type.UnixTimestampField(auto_now_add=True)),
+                ('create_date', drfaddons.datatypes.UnixTimestampField(auto_now_add=True)),
                 ('is_validated', models.BooleanField(default=False, verbose_name='Is Validated')),
                 ('validate_attempt', models.IntegerField(default=3, verbose_name='Attempted Validation')),
                 ('type', models.CharField(choices=[('mobile', 'Mobile Number'), ('email', 'EMail Address')], default='email', max_length=15, verbose_name='EMail/Mobile')),
                 ('send_counter', models.IntegerField(default=0, verbose_name='OTP Sent Counter')),
                 ('sms_id', models.CharField(blank=True, max_length=254, null=True, verbose_name='SMS ID')),
-                ('reactive_at', django_custom_modules.db_type.UnixTimestampField()),
+                ('reactive_at', drfaddons.datatypes.UnixTimestampField()),
             ],
             options={
                 'verbose_name': 'OTP Validation',

@@ -80,4 +80,4 @@ class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionDetails
         fields = ('mode', 'amount', 'transaction_date', 'contact', 'category', 'comments')
-        read_only_fields = ('created_by', 'create_date', 'last_modified')
+        read_only_fields = ('created_by', 'create_date', 'update_date')

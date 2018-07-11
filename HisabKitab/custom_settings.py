@@ -11,6 +11,7 @@ CUSTOM_APPS = [
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+    'drfaddons',
 ]
 
 # FCM_DJANGO_SETTINGS = {
@@ -51,7 +52,7 @@ REST_FRAMEWORK = {
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'django_custom_modules.auth.JSONWebTokenAuthenticationQS',
+        'drfaddons.auth.JSONWebTokenAuthenticationQS',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
     ),
@@ -68,7 +69,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 
     'DEFAULT_FILTER_BACKENDS': (
-        'django_custom_modules.serializer.IsOwnerFilterBackend',
+        'drfaddons.serializer.IsOwnerFilterBackend',
         'django_filters.rest_framework.DjangoFilterBackend'
     ),
 
@@ -91,7 +92,7 @@ JWT_AUTH = {
 
     'JWT_DECODE_HANDLER': 'rest_framework_jwt.utils.jwt_decode_handler',
 
-    'JWT_PAYLOAD_HANDLER': 'django_custom_modules.auth.jwt_payload_handler',
+    'JWT_PAYLOAD_HANDLER': 'drfaddons.auth.jwt_payload_handler',
 
     'JWT_PAYLOAD_GET_USER_ID_HANDLER': 'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
 

@@ -8,7 +8,7 @@ class ShowTransactionAmount(ListAPIView):
     This view is to show the details of transactions.
     """
     from .serializers import ShowTransactionDetailsSerializer
-    from django_custom_modules.serializer import IsOwnerFilterBackend
+    from drfaddons.serializer import IsOwnerFilterBackend
     from django_filters.rest_framework import DjangoFilterBackend
     from rest_framework.filters import SearchFilter, OrderingFilter
     from .filters import RangeFiltering
@@ -62,7 +62,7 @@ class DeleteTransactionAmount(DestroyAPIView):
     """
     This view is to delete a transaction.
     """
-    from django_custom_modules.serializer import IsOwnerFilterBackend
+    from drfaddons.serializer import IsOwnerFilterBackend
     from .serializers import DeleteTransactionDetailsSerializer
 
     filter_backends = (IsOwnerFilterBackend, )
@@ -75,7 +75,7 @@ class UpdateTransactionAmount(UpdateAPIView):
     This view is to update a transaction.
     """
     from .serializers import UpdateTransactionDetailsSerializer
-    from django_custom_modules.serializer import IsOwnerFilterBackend
+    from drfaddons.serializer import IsOwnerFilterBackend
 
     queryset = TransactionDetails.objects.all()
     serializer_class = UpdateTransactionDetailsSerializer

@@ -8,7 +8,7 @@ class ShowContacts(ListAPIView):
     """
     from .serializers import ShowContactDetailSerializer
     from rest_framework.filters import SearchFilter
-    from django_custom_modules.serializer import IsOwnerFilterBackend
+    from drfaddons.serializer import IsOwnerFilterBackend
     from django_filters.rest_framework import DjangoFilterBackend
 
     queryset = ContactDetails.objects.all()

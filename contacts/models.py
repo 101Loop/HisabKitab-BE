@@ -1,5 +1,5 @@
 from django.db import models
-from django_custom_modules.data_model import CreateUpdateModel
+from drfaddons.models import CreateUpdateModel
 from django.utils.text import gettext_lazy as _
 
 

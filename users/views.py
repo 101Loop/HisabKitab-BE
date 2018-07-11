@@ -2,7 +2,7 @@ import datetime
 
 from rest_framework.mixins import status
 
-from django_custom_modules.views import ValidateAndPerformView
+from drfaddons.views import ValidateAndPerformView
 
 from . import serializers
 from .models import OTPValidation
@@ -179,7 +179,7 @@ def send_otp(prop, value, otpobj, recip):
     -------
 
     """
-    from django_custom_modules.add_ons import send_message
+    from drfaddons.add_ons import send_message
 
     otp = otpobj.otp
 
@@ -203,8 +203,8 @@ def send_otp(prop, value, otpobj, recip):
 
 def login_user(user: User, request)->(dict, int):
 
-    from django_custom_modules.auth import jwt_payload_handler
-    from django_custom_modules.add_ons import get_client_ip
+    from drfaddons.auth import jwt_payload_handler
+    from drfaddons.add_ons import get_client_ip
     from rest_framework_jwt.utils import jwt_encode_handler
     from .models import AuthTransaction
 
@@ -256,7 +256,7 @@ class Register(ValidateAndPerformView):
     serializer_class = serializers.UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from django_custom_modules.add_ons import send_message
+        from drfaddons.add_ons import send_message
 
         # email_validated = check_validation(serialized_data.initial_data['email'])
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
@@ -322,7 +322,7 @@ class Login(ValidateAndPerformView):
 
     @csrf_exempt
     def post(self, request):
-        from django_custom_modules.add_ons import JsonResponse
+        from drfaddons.add_ons import JsonResponse
 
         serialize = self.serializer_class(data=request.data)
         if serialize.is_valid():
@@ -342,7 +342,7 @@ class SendOTP(ValidateAndPerformView):
     serializer_class = serializers.SendOTPSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from django_custom_modules.add_ons import validate_email, validate_mobile
+        from drfaddons.add_ons import validate_email, validate_mobile
 
         prop = serialized_data.initial_data['prop']
         value = serialized_data.initial_data['value']

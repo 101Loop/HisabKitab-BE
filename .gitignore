@@ -108,3 +108,4 @@ venv.bak/
 
 # Ignore static folder
 static/
+backup_script.sh

@@ -1,5 +1,5 @@
 from django.db import models
-from django_custom_modules.db_type import UnixTimestampField
+from drfaddons.datatypes import UnixTimestampField
 from django.utils.text import gettext_lazy as _
 
 
