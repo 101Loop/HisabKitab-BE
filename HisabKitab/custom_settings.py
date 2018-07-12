@@ -2,11 +2,11 @@ import datetime
 
 
 CUSTOM_APPS = [
-    'contacts.apps.ContactsConfig',
+    'drf_contact',
     'users.apps.UsersConfig',
-    'transactions.apps.TransactionsConfig',
+    'drf_transaction',
     'corsheaders',
-    'feedback.apps.FeedbackConfig',
+    'drf_feedback',
     'fcm_notification.apps.FcmNotificationConfig',
     'oauth2_provider',
     'social_django',

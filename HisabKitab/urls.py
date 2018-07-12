@@ -15,7 +15,6 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from transactions.views import about
 
 
 urlpatterns = [
@@ -23,10 +22,9 @@ urlpatterns = [
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
     url(r'^admin/', admin.site.urls),
     url(r'^api/users/', include('users.urls')),
-    url(r'^api/transactions/', include('transactions.urls')),
-    url(r'^api/contacts/', include('contacts.urls')),
-    url(r'^$', about, name='about'),
-    url(r'^api/feedback/', include('feedback.urls')),
+    url(r'^api/transactions/', include('drf_transaction.urls')),
+    url(r'^api/contacts/', include('drf_contact.urls')),
+    url(r'^api/feedback/', include('drf_feedback.urls')),
     url(r'^api/token/', include('fcm_notification.urls')),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
 ]
