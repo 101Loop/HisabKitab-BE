@@ -7,6 +7,7 @@ from drfaddons.views import ValidateAndPerformView
 from . import serializers
 from .models import OTPValidation
 from django.contrib.auth import get_user_model
+from rest_framework.generics import UpdateAPIView
 
 
 User = get_user_model()
@@ -441,3 +442,50 @@ class LoginOTP(ValidateAndPerformView):
                     data, status_code = login_user(user, self.request)
 
         return data, status_code
+
+
+class ChangePassword(UpdateAPIView):
+    """
+    This view will let the user to change the password.
+    """
+
+    from .serializers import ForgotPasswordSerializer
+    from .models import User
+
+    queryset = User.objects.all()
+    serializer_class = ForgotPasswordSerializer
+
+    def update(self, request, *args, **kwargs):
+
+        from drfaddons.add_ons import JsonResponse
+
+        sdata = self.ForgotPasswordSerializer(data=request.data)
+        if sdata.is_valid():
+            request.user.set_password(sdata.data['new_password'])
+            request.user.save()
+            return JsonResponse({'success': True}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return JsonResponse(sdata.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UpdateProfileView(UpdateAPIView):
+    """
+    This view is to update a user profile.
+    """
+    from .serializers import UpdateProfileSerializer
+    from .models import User
+
+    queryset = User.objects.all()
+    serializer_class = UpdateProfileSerializer
+
+    def update(self, request, *args, **kwargs):
+
+        from drfaddons.add_ons import JsonResponse
+
+        serializer = self.UpdateProfileSerializer(request.user, data=request.data)
+        if serializer.is_valid ():
+            self.perform_update(serializer)
+            request.user.save()
+            return JsonResponse(serializer.data, status=status.HTTP_202_ACCEPTED)
+        else:
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

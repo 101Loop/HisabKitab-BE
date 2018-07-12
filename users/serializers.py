@@ -138,3 +138,30 @@ class CheckUniqueSerializer(serializers.Serializer):
     """
     prop = serializers.ChoiceField(choices=('email', 'mobile', 'username'))
     value = serializers.CharField()
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    """
+    This serializer is for letting the user to change the password after being successfully LoggedIn.
+    """
+    new_password = serializers.CharField(max_length=16, required=True)
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    """
+    This serializer is to update the profile of a user.
+    """
+
+    username = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    mobile = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
+    password = serializers.CharField(required=False)
+
+    class Meta:
+
+        from .models import User
+
+        model = User
+        fields = ('username', 'name', 'email', 'mobile', 'password')
+

@@ -17,4 +17,8 @@ urlpatterns = [
     path('loginotp/', views.LoginOTP.as_view(), name='Login OTP'),
     # ex: api/users/isunique/
     path('isunique/', views.CheckUnique.as_view(), name='Check Unique'),
+    # ex: api/users/changepassword/
+    path('changepassword/', views.ChangePassword.as_view(), name='Change Password'),
+    # ex: api/users/updateprofile/
+    path('updateprofile/', views.UpdateProfileView.as_view(), name='Update-Profile'),
 ]
