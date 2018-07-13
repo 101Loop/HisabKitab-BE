@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-
+from users.views import about
 
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^api/feedback/', include('drf_feedback.urls')),
     url(r'^api/token/', include('fcm_notification.urls')),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
+    url(r'^', about, name='about'),
 ]

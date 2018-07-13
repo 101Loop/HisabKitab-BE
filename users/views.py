@@ -489,3 +489,13 @@ class UpdateProfileView(UpdateAPIView):
             return JsonResponse(serializer.data, status=status.HTTP_202_ACCEPTED)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def about(request):
+    """
+    This function is used to set the about page.
+    """
+    from django.shortcuts import render
+
+    return render(request, 'users/about.html')
+
