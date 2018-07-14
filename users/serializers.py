@@ -151,17 +151,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     """
     This serializer is to update the profile of a user.
     """
-
-    username = serializers.CharField(required=False)
     email = serializers.EmailField(required=False)
     mobile = serializers.CharField(required=False)
     name = serializers.CharField(required=False)
-    password = serializers.CharField(required=False)
 
     class Meta:
 
         from .models import User
 
         model = User
-        fields = ('username', 'name', 'email', 'mobile', 'password')
-
+        fields = ('name', 'email', 'mobile')
