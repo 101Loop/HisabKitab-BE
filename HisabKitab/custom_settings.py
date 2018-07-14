@@ -28,7 +28,7 @@ CUSTOM_MIDDLEWARE = [
 
 CORS_ORIGIN_WHITELIST = (
     'hisabkitabin.firebaseapp.com',
-    'hisabkitab.in',
+    'localhost:4200',
 )
 
 CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
