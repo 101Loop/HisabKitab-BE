@@ -73,7 +73,7 @@ class OTPValidation(models.Model):
     is_validated = models.BooleanField(_('Is Validated'), default=False)
     validate_attempt = models.IntegerField(_('Attempted Validation'), default=3)
     type = models.CharField(_('EMail/Mobile'), default='email', max_length=15,
-                            choices={('email', 'EMail Address'), ('mobile', 'Mobile Number')})
+                            choices=[('email', 'EMail Address'), ('mobile', 'Mobile Number')])
     send_counter = models.IntegerField(_('OTP Sent Counter'), default=0)
     sms_id = models.CharField(_('SMS ID'), max_length=254, null=True, blank=True)
     reactive_at = cmodels.UnixTimestampField(_('ReActivate Sending OTP'))

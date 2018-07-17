@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^api/contacts/', include('drf_contact.urls')),
     url(r'^api/feedback/', include('drf_feedback.urls')),
     url(r'^api/token/', include('fcm_notification.urls')),
+    url(r'^api/account/', include('drf_account.urls')),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
     url(r'^', about, name='about'),
 ]

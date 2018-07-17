@@ -2,6 +2,7 @@ import datetime
 
 
 CUSTOM_APPS = [
+    'drf_account',
     'drf_contact',
     'users.apps.UsersConfig',
     'drf_transaction',
@@ -42,9 +43,8 @@ CORS_ALLOW_METHODS = (
 )
 
 AUTHENTICATION_BACKENDS = ['users.auth.MultiFieldModelBackend',
-                            'rest_framework_social_oauth2.backends.DjangoOAuth2',
-                            'django.contrib.auth.backends.ModelBackend',
-                            ]
+                           'rest_framework_social_oauth2.backends.DjangoOAuth2',
+                           ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
