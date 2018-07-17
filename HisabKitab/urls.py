@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from users.views import about
+from usersettings.views import ChangeSettingsView
 
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^api/feedback/', include('drf_feedback.urls')),
     url(r'^api/token/', include('fcm_notification.urls')),
     url(r'^api/account/', include('drf_account.urls')),
+    url(r'^api/usersetting/', ChangeSettingsView.as_view(), name='Change User Settings'),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
     url(r'^', about, name='about'),
 ]

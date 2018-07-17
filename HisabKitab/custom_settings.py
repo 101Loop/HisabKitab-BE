@@ -2,6 +2,7 @@ import datetime
 
 
 CUSTOM_APPS = [
+    'usersettings',
     'drf_account',
     'drf_contact',
     'users.apps.UsersConfig',
