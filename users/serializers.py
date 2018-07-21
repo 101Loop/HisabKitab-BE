@@ -19,18 +19,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
                             This contains the mobile number of the user.
                         'password' : str
                             This contains the password of the user.
-                        'organization' : str
-                            This contains the organisation of the user.
+
     Examples
     --------
-    >>> print(UserRegisterSerializer(data={'username':'test@testing.com', 'name':'test', 'email': 'test@testing.com', 'mobile' : '123456', 'password': '123780', 'organization': 'CMT'}))
-    UserRegisterSerializer(data={'username': 'test@testing.com', 'name': 'dinesh', 'email': 'test@testing.com', 'mobile': '123456', 'password': '123780', 'organization': 'CMT'}):
+    >>> print(UserRegisterSerializer(data={'username':'test@testing.com', 'name':'test', 'email': 'test@testing.com', 'mobile' : '123456', 'password': '123780'}))
+    UserRegisterSerializer(data={'username': 'test@testing.com', 'name': 'dinesh', 'email': 'test@testing.com', 'mobile': '123456', 'password': '123780'}):
     username = CharField(label='Unique UserName', max_length=254, validators=[<UniqueValidator(queryset=User.objects.all())>])
     name = CharField(label='Full Name', max_length=500)
     email = EmailField(label='EMail Address', max_length=254, validators=[<UniqueValidator(queryset=User.objects.all())>])
     mobile = CharField(label='Mobile Number', max_length=150, validators=[<UniqueValidator(queryset=User.objects.all())>])
     password = CharField(max_length=128)
-    organization = CharField(max_length=500)
     """
 
     class Meta:

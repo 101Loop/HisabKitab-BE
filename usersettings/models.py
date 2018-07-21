@@ -4,6 +4,9 @@ from django.utils.text import gettext_lazy as _
 
 
 class UserSettings(CreateUpdateModel):
+    """
+    A custom UserSettings model that keeps a record of the type of mode of the user.
+    """
     from django.contrib.auth import get_user_model
 
     advance_mode = models.BooleanField(_('Advance Mode'), default=False)

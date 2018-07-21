@@ -1,4 +1,4 @@
-"""HisabKitab URL Configuration
+"""Hisab Kitab URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -30,5 +30,5 @@ urlpatterns = [
     url(r'^api/account/', include('drf_account.urls')),
     url(r'^api/usersetting/', ChangeSettingsView.as_view(), name='Change User Settings'),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
-    url(r'^', about, name='about'),
+    url(r'^$', about, name='about'),
 ]
