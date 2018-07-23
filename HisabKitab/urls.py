@@ -18,6 +18,24 @@ from django.contrib import admin
 from users.views import about
 from usersettings.views import ChangeSettingsView
 
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="HisabKitab API",
+      default_version='v1',
+      description="API based on DRF YASG for HisabKitab",
+#       terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="info@vitartha.com"),
+      license=openapi.License(name="BSD License"),
+   ),
+#   validators=['flex', 'ssv'],
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
@@ -30,5 +48,8 @@ urlpatterns = [
     url(r'^api/account/', include('drf_account.urls')),
     url(r'^api/usersetting/', ChangeSettingsView.as_view(), name='Change User Settings'),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
+    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
+    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
     url(r'^$', about, name='about'),
 ]
