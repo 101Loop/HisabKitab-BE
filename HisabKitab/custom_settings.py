@@ -69,7 +69,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 
     'DEFAULT_FILTER_BACKENDS': (
-        'drfaddons.serializer.IsOwnerFilterBackend',
+        'drfaddons.filters.IsOwnerFilterBackend',
         'django_filters.rest_framework.DjangoFilterBackend'
     ),
 
