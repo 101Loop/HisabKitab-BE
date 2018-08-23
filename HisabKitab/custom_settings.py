@@ -8,13 +8,10 @@ CUSTOM_APPS = [
     'users.apps.UsersConfig',
     'drf_transaction',
     'corsheaders',
-    'drf_feedback',
-    'fcm_notification.apps.FcmNotificationConfig',
     'oauth2_provider',
-    'social_django',
-    'rest_framework_social_oauth2',
     'drfaddons',
-    'drf_yasg'
+    'drf_yasg',
+    'munsiji',
 ]
 
 # FCM_DJANGO_SETTINGS = {
@@ -29,11 +26,7 @@ CUSTOM_MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    'hisabkitab.in',
-)
-
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_METHODS = (
     'GET',
@@ -43,9 +36,10 @@ CORS_ALLOW_METHODS = (
     'DELETE',
 )
 
-AUTHENTICATION_BACKENDS = ['users.auth.MultiFieldModelBackend',
-                           'rest_framework_social_oauth2.backends.DjangoOAuth2',
-                           ]
+AUTHENTICATION_BACKENDS = [
+    'oauth2_provider.backends.OAuth2Backend',
+    'users.auth.MultiFieldModelBackend',
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -53,9 +47,8 @@ REST_FRAMEWORK = {
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'drfaddons.auth.JSONWebTokenAuthenticationQS',
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework_social_oauth2.authentication.SocialAuthentication',
+        'drfaddons.auth.JSONWebTokenAuthenticationQS',
     ),
 
     'DEFAULT_PARSER_CLASSES': (

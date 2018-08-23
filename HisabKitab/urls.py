@@ -27,29 +27,25 @@ schema_view = get_schema_view(
       title="HisabKitab API",
       default_version='v1',
       description="API based on DRF YASG for HisabKitab",
-#       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="info@vitartha.com"),
       license=openapi.License(name="BSD License"),
    ),
-#   validators=['flex', 'ssv'],
    public=True,
    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
-    url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
-    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
-    url(r'^admin/', admin.site.urls),
     url(r'^api/users/', include('users.urls')),
     url(r'^api/transactions/', include('drf_transaction.urls')),
     url(r'^api/contacts/', include('drf_contact.urls')),
-    url(r'^api/feedback/', include('drf_feedback.urls')),
-    url(r'^api/token/', include('fcm_notification.urls')),
     url(r'^api/account/', include('drf_account.urls')),
     url(r'^api/usersetting/', ChangeSettingsView.as_view(), name='Change User Settings'),
-    url(r'^auth/', include('rest_framework_social_oauth2.urls')),
+    url(r'^munsiji/', include('munsiji.urls')),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
-    url(r'^$', about, name='about'),
+    url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLSz
+    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^', admin.site.urls),
 ]
