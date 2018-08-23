@@ -26,7 +26,13 @@ CUSTOM_MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware'
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'hisabkitab.in',
+    'y5sa0ot8y4.execute-api.ap-south-1.amazonaws.com',
+    'oauth-redirect.googleusercontent.com',
+)
+
+CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 CORS_ALLOW_METHODS = (
     'GET',
@@ -35,6 +41,8 @@ CORS_ALLOW_METHODS = (
     'PUT',
     'DELETE',
 )
+
+LOGIN_REDIRECT_URL = 'https://hisabkitab.in/login'
 
 AUTHENTICATION_BACKENDS = [
     'oauth2_provider.backends.OAuth2Backend',
