@@ -30,6 +30,8 @@ class MultiFieldModelBackend(ModelBackend):
 
         if username is None:
             username = kwargs.get(self.user_model.USERNAME_FIELD)
+            if not username:
+                return None
 
         if username.isdigit():
             kwargs = {'mobile': username}
