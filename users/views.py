@@ -193,7 +193,7 @@ def send_otp(prop, value, otpobj, recip):
     message = "OTP for verifying " + prop + ": " + value + " is " + otp + ". Don't share this with anyone!"
     subject = "OTP for Verification"
 
-    rdata = send_message(prop, message, subject, recip)
+    rdata = send_message(message, subject, value, recip)
 
     if rdata['success']:
         otpobj.reactive_at = datetime.datetime.now() + datetime.timedelta(minutes=3)
@@ -285,7 +285,7 @@ class Register(ValidateAndPerformView):
             production & development of this app. 
             Thank You! 
             """
-            send_message('email', message, subject, user.email)
+            send_message(message, subject, user.email, user.email)
         else:
             status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
             if not email_validated:
@@ -409,7 +409,7 @@ class LoginOTP(ValidateAndPerformView):
         otp = serialized_data.data['otp']
         value = serialized_data.data['value']
 
-        if value.isdigit():
+        if value.isdigit() or value.startswith('+'):
             prop = 'mobile'
             try:
                 user = User.objects.get(mobile=value)

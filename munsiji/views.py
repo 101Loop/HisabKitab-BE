@@ -37,6 +37,8 @@ def addTrans(user, amount, name, trans_date, mode, category, purpose=None):
 
 
 class MunsiJiCall(APIView):
+    from rest_framework.permissions import AllowAny
+
     renderer_classes = (JSONRenderer, )
     parser_classes = (JSONParser, )
     permission_classes = (TokenHasReadWriteScope, )
@@ -47,6 +49,13 @@ class MunsiJiCall(APIView):
 
     @csrf_exempt
     def post(self, request, *args, **kwargs):
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        logger.info("HERE ARE ALL THE DATA! ---- HIMANSHU ----")
+        logger.debug({'data': request.data, 'header': request.META})
+
         data = request.data
         user = request.user
         query_result = data['queryResult']
