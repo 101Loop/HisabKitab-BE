@@ -3,7 +3,7 @@ from .models import *
 
 
 class AuthorAdmin(admin.ModelAdmin):
-    readonly_fields = ('password', )
+    readonly_fields = ("password",)
 
 
 admin.site.register(User, AuthorAdmin)

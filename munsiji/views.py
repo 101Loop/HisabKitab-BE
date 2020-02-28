@@ -10,7 +10,9 @@ def add_trans(user, amount, name, trans_date, mode, category, purpose=None):
 
     from drf_contact.models import ContactDetail
 
-    contact_obj, create = ContactDetail.objects.get_or_create(name=name, created_by=user)
+    contact_obj, create = ContactDetail.objects.get_or_create(
+        name=name, created_by=user
+    )
 
     td = TransactionDetail()
     td.created_by = user
@@ -23,25 +25,28 @@ def add_trans(user, amount, name, trans_date, mode, category, purpose=None):
     td.category = category
     td.mode = TransactionMode.objects.get(pk=mode)
     td.save()
-    return '%s, your %s transaction of %s amount toward %s done on %s via %s has been recorded.' %\
-           (td.created_by.name, td.get_category_display(), td.amount, td.contact.name, td.transaction_date,
-            td.mode.mode)
+    return (
+        "%s, your %s transaction of %s amount toward %s done on %s via %s has been recorded."
+        % (
+            td.created_by.name,
+            td.get_category_display(),
+            td.amount,
+            td.contact.name,
+            td.transaction_date,
+            td.mode.mode,
+        )
+    )
 
 
 def future_value(p: float, r: float, t: float, freq: str, lumpsum=False):
-    frequency_factor = {
-        'month': 12,
-        'year': 1,
-        'quarter': 4,
-        'half': 2
-    }
-    r = (r/(frequency_factor[freq])/100)
-    n = t*frequency_factor[freq]
-    fv = ((1 + r)**n) - 1
-    fv = fv/r
-    fv = fv * (1+r)
+    frequency_factor = {"month": 12, "year": 1, "quarter": 4, "half": 2}
+    r = r / (frequency_factor[freq]) / 100
+    n = t * frequency_factor[freq]
+    fv = ((1 + r) ** n) - 1
+    fv = fv / r
+    fv = fv * (1 + r)
     fv = fv * p
-    return 'Your future value will be approximately %s.' % round(fv, 2)
+    return "Your future value will be approximately %s." % round(fv, 2)
 
 
 class MunsiJiCall(APIView):
@@ -54,25 +59,29 @@ class MunsiJiCall(APIView):
     from rest_framework.renderers import JSONRenderer
     from rest_framework.parsers import JSONParser
 
-    renderer_classes = (JSONRenderer, )
-    parser_classes = (JSONParser, )
-    permission_classes = (AllowAny, )
+    renderer_classes = (JSONRenderer,)
+    parser_classes = (JSONParser,)
+    permission_classes = (AllowAny,)
 
     def parse_query_result(self, query_result):
         user = self.request.user
 
-        params = query_result['parameters']
-        query_text = query_result['queryText']
-        intent = query_result['intent']
-        lang = query_result['languageCode']
+        params = query_result["parameters"]
+        query_text = query_result["queryText"]
+        intent = query_result["intent"]
+        lang = query_result["languageCode"]
 
-        response = {"fulfillmentText": "Some error occurred while processing your request. Kindly try again later."}
+        response = {
+            "fulfillmentText": "Some error occurred while processing your request. Kindly try again later."
+        }
         try:
-            intent_obj = intent_details[intent['displayName']]
+            intent_obj = intent_details[intent["displayName"]]
         except KeyError:
-            response['fulfillmentText'] = "Currently server is unable to handle provided intent request."
+            response[
+                "fulfillmentText"
+            ] = "Currently server is unable to handle provided intent request."
         else:
-            response['fulfillmentText'] = intent_obj['func'](user, params)
+            response["fulfillmentText"] = intent_obj["func"](user, params)
         return response
 
     @csrf_exempt
@@ -86,27 +95,47 @@ class MunsiJiCall(APIView):
         logger = logging.getLogger(__name__)
 
         logger.info("HERE ARE ALL THE DATA! ---- HIMANSHU ----")
-        logger.debug({'data': request.data, 'header': request.META})
+        logger.debug({"data": request.data, "header": request.META})
 
         data = request.data
-        query_result = data['queryResult']
+        query_result = data["queryResult"]
         response = self.parse_query_result(query_result)
-        return Response(response, status=status.HTTP_200_OK, headers={'Content-type': 'application/json'})
+        return Response(
+            response,
+            status=status.HTTP_200_OK,
+            headers={"Content-type": "application/json"},
+        )
 
 
 intent_details = {
-    'AddDebit': {
-        'func': lambda user, parameters: add_trans(user, parameters['debit']['amount'], parameters['person'],
-                                                   parameters['date'], int(parameters['mode']), 'D',
-                                                   parameters['purpose'])
+    "AddDebit": {
+        "func": lambda user, parameters: add_trans(
+            user,
+            parameters["debit"]["amount"],
+            parameters["person"],
+            parameters["date"],
+            int(parameters["mode"]),
+            "D",
+            parameters["purpose"],
+        )
     },
-    'AddCredit': {
-        'func': lambda user, parameters: add_trans(user, parameters['debit']['amount'], parameters['person'],
-                                                   parameters['date'], int(parameters['mode']), 'C',
-                                                   parameters['purpose'])
+    "AddCredit": {
+        "func": lambda user, parameters: add_trans(
+            user,
+            parameters["debit"]["amount"],
+            parameters["person"],
+            parameters["date"],
+            int(parameters["mode"]),
+            "C",
+            parameters["purpose"],
+        )
     },
-    'SIPCalculator_Return': {
-        'func': lambda user, parameters: future_value(parameters['amount']['amount'], parameters['rate'],
-                                                      parameters['years'], parameters['freq'])
-    }
+    "SIPCalculator_Return": {
+        "func": lambda user, parameters: future_value(
+            parameters["amount"]["amount"],
+            parameters["rate"],
+            parameters["years"],
+            parameters["freq"],
+        )
+    },
 }

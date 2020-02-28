@@ -26,30 +26,42 @@ from drf_yasg import openapi
 from rest_framework import permissions
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="HisabKitab API",
-      default_version='v1',
-      description="API based on DRF YASG for HisabKitab",
-      contact=openapi.Contact(email="info@vitartha.com"),
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="HisabKitab API",
+        default_version="v1",
+        description="API based on DRF YASG for HisabKitab",
+        contact=openapi.Contact(email="info@vitartha.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
-    path('accounts/login/', LoginView.as_view(), name='Login-User'),
-    path('api/users/', include('users.urls')),
-    path('api/transactions/', include('drf_transaction.urls')),
-    path('api/contacts/', include('drf_contact.urls')),
-    path('api/account/', include('drf_account.urls')),
-    path('api/usersetting/', ChangeSettingsView.as_view(), name='Change User Settings'),
-    path('munsiji/', include('munsiji.urls')),
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=None), name='schema-json'),
-    re_path('swagger/$', schema_view.with_ui('swagger', cache_timeout=None), name='schema-swagger-ui'),
-    re_path('redoc/$', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
-    path('jet/', include('jet.urls', 'jet')),  # Django JET URLSz
-    path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLS
-    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    path('', admin.site.urls),
+    path("accounts/login/", LoginView.as_view(), name="Login-User"),
+    path("api/users/", include("users.urls")),
+    path("api/transactions/", include("drf_transaction.urls")),
+    path("api/contacts/", include("drf_contact.urls")),
+    path("api/account/", include("drf_account.urls")),
+    path("api/usersetting/", ChangeSettingsView.as_view(), name="Change User Settings"),
+    path("munsiji/", include("munsiji.urls")),
+    re_path(
+        r"^swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=None),
+        name="schema-json",
+    ),
+    re_path(
+        "swagger/$",
+        schema_view.with_ui("swagger", cache_timeout=None),
+        name="schema-swagger-ui",
+    ),
+    re_path(
+        "redoc/$", schema_view.with_ui("redoc", cache_timeout=None), name="schema-redoc"
+    ),
+    path("jet/", include("jet.urls", "jet")),  # Django JET URLSz
+    path(
+        "jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")
+    ),  # Django JET dashboard URLS
+    path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
+    path("", admin.site.urls),
 ]
