@@ -33,7 +33,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'name', 'email', 'mobile', 'password')
+        fields = ("username", "name", "email", "mobile", "password")
 
 
 class UserShowSerializer(serializers.ModelSerializer):
@@ -58,8 +58,8 @@ class UserShowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'name')
-        read_only_fields = ('username', 'name')
+        fields = ("username", "name")
+        read_only_fields = ("username", "name")
 
 
 class SendOTPSerializer(serializers.Serializer):
@@ -85,8 +85,9 @@ class SendOTPSerializer(serializers.Serializer):
     prop = ChoiceField(choices=('email', 'mobile'))
     email = EmailField()
     """
+
     value = serializers.CharField()
-    prop = serializers.ChoiceField(choices=('email', 'mobile'))
+    prop = serializers.ChoiceField(choices=("email", "mobile"))
     email = serializers.EmailField()
 
 
@@ -109,6 +110,7 @@ class OTPVerify(serializers.Serializer):
     value = CharField()
     otp = CharField(default=None)
     """
+
     value = serializers.CharField()
     otp = serializers.CharField(default=None)
 
@@ -134,7 +136,8 @@ class CheckUniqueSerializer(serializers.Serializer):
     prop = ChoiceField(choices=('email', 'mobile', 'username'))
     value = CharField()
     """
-    prop = serializers.ChoiceField(choices=('email', 'mobile', 'username'))
+
+    prop = serializers.ChoiceField(choices=("email", "mobile", "username"))
     value = serializers.CharField()
 
 
@@ -142,6 +145,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
     """
     This serializer is for letting the user to change the password after being successfully LoggedIn.
     """
+
     new_password = serializers.CharField(max_length=16, required=True)
 
 
@@ -149,6 +153,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     """
     This serializer is to update the profile of a user.
     """
+
     email = serializers.EmailField(required=False)
     mobile = serializers.CharField(required=False)
     name = serializers.CharField(required=False)
@@ -158,4 +163,4 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         from .models import User
 
         model = User
-        fields = ('name', 'email', 'mobile')
+        fields = ("name", "email", "mobile")

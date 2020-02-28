@@ -3,6 +3,7 @@ from django.contrib.auth.backends import ModelBackend
 
 class MultiFieldModelBackend(ModelBackend):
     from django.contrib.auth import get_user_model
+
     """
     This is a ModelBacked that allows authentication with either a username or an email address or mobile number.
     """
@@ -34,11 +35,11 @@ class MultiFieldModelBackend(ModelBackend):
                 return None
 
         if username.isdigit():
-            kwargs = {'mobile': username}
+            kwargs = {"mobile": username}
         elif not re.match(r"[^@]+@[^@]+\.[^@]+", username):
-            kwargs = {'username': username}
+            kwargs = {"username": username}
         else:
-            kwargs = {'email': username}
+            kwargs = {"email": username}
         try:
             user = self.user_model.objects.get(**kwargs)
             if user.check_password(password):
