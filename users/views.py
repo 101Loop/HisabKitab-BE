@@ -9,7 +9,6 @@ from .models import OTPValidation
 from django.contrib.auth import get_user_model
 from rest_framework.generics import UpdateAPIView
 
-
 User = get_user_model()
 
 
@@ -190,7 +189,7 @@ def send_otp(prop, value, otpobj, recip):
     -------
 
     """
-    from drfaddons.add_ons import send_message
+    from drfaddons.utils import send_message
 
     otp = otpobj.otp
 
@@ -225,8 +224,8 @@ def send_otp(prop, value, otpobj, recip):
 
 def login_user(user: User, request) -> (dict, int):
 
-    from drfaddons.auth import jwt_payload_handler
-    from drfaddons.add_ons import get_client_ip
+    from rest_framework_jwt.utils import jwt_payload_handler
+    from drfaddons.utils import get_client_ip
     from rest_framework_jwt.utils import jwt_encode_handler
     from .models import AuthTransaction
 
@@ -283,7 +282,7 @@ class Register(ValidateAndPerformView):
     serializer_class = serializers.UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from drfaddons.add_ons import send_message
+        from drfaddons.utils import send_message
 
         # email_validated = check_validation(serialized_data.initial_data['email'])
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
@@ -359,7 +358,7 @@ class Login(ValidateAndPerformView):
 
     @csrf_exempt
     def post(self, request):
-        from drfaddons.add_ons import JsonResponse
+        from drfaddons.utils import JsonResponse
 
         serialize = self.serializer_class(data=request.data)
         if serialize.is_valid():
@@ -384,7 +383,7 @@ class SendOTP(ValidateAndPerformView):
     serializer_class = serializers.SendOTPSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from drfaddons.add_ons import validate_email, validate_mobile
+        from drfaddons.utils import validate_email, validate_mobile
 
         prop = serialized_data.initial_data["prop"]
         value = serialized_data.initial_data["value"]
@@ -512,7 +511,7 @@ class ChangePassword(UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
 
-        from drfaddons.add_ons import JsonResponse
+        from drfaddons.utils import JsonResponse
 
         sdata = self.ForgotPasswordSerializer(data=request.data)
         if sdata.is_valid():
@@ -536,7 +535,7 @@ class UpdateProfileView(UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
 
-        from drfaddons.add_ons import JsonResponse
+        from drfaddons.utils import JsonResponse
 
         serializer = self.UpdateProfileSerializer(request.user, data=request.data)
         if serializer.is_valid():
