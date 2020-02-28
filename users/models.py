@@ -50,7 +50,7 @@ class AuthTransaction(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     ip_address = models.GenericIPAddressField(blank=False, null=False)
-    date_created = models.DateTimeField(_("Created On"), auto_created=True)
+    date_created = models.DateTimeField(_("Created On"), auto_now_add=True)
     token = models.TextField(_("JWT Token passed"))
     session = models.TextField(_("Session Passed"))
 
@@ -72,7 +72,7 @@ class OTPValidation(models.Model):
         _("Destination Address (Mobile/EMail)"), max_length=254, unique=True
     )
     create_date = models.DateTimeField(_("Create Date"), auto_now_add=True)
-    last_modified = models.DateTimeField(_("Date Modified"), auto_created=True)
+    last_modified = models.DateTimeField(_("Date Modified"), auto_now=True)
     is_validated = models.BooleanField(_("Is Validated"), default=False)
     validate_attempt = models.IntegerField(_("Attempted Validation"), default=3)
     type = models.CharField(
