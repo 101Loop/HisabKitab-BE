@@ -5,6 +5,7 @@ class ChangeSettingsView(RetrieveUpdateAPIView):
     """
     This view is to check the type of user.
     """
+
     from .serializers import SettingsSerializer
 
     serializer_class = SettingsSerializer
