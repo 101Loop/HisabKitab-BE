@@ -317,7 +317,7 @@ class Register(ValidateAndPerformView):
             production & development of this app.
             Thank You!
             """
-            send_message(message, subject, user.email, user.email)
+            send_message(message, subject, [user.email], [user.email])
         else:
             status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
             if not email_validated:
