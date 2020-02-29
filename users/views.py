@@ -213,7 +213,9 @@ def send_otp(prop, value, otpobj, recip):
     )
     subject = "OTP for Verification"
 
-    rdata = send_message(message, subject, value, recip)
+    rdata = send_message(
+        message=message, subject=subject, recip_email=[recip], recip=[recip]
+    )
 
     if rdata["success"]:
         otpobj.reactive_at = datetime.datetime.now() + datetime.timedelta(minutes=3)
