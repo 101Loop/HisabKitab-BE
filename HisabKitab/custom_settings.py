@@ -30,7 +30,7 @@ DEBUG = env("DEBUG")
 # Raises django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
 
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 
 # Database
@@ -80,11 +80,10 @@ CUSTOM_APPS = [
 # devices = GCMDevice.objects.filter(registration_id=)
 # devices.send_message("Happy name day!")
 
-CUSTOM_MIDDLEWARE = ["corsheaders.middleware.CorsMiddleware"]
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = env.list("CORS_ORIGIN_WHITELIST")
 
-CORS_ORIGIN_WHITELIST = env("CORS_ORIGIN_WHITELIST")
-
-CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
+# CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 CORS_ALLOW_METHODS = (
     "GET",
