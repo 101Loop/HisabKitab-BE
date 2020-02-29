@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.utils import timezone
 from django.utils.text import gettext_lazy as _
 
 
@@ -83,7 +84,9 @@ class OTPValidation(models.Model):
     )
     send_counter = models.IntegerField(_("OTP Sent Counter"), default=0)
     sms_id = models.CharField(_("SMS ID"), max_length=254, null=True, blank=True)
-    reactive_at = models.DateTimeField(_("ReActivate Sending OTP"))
+    reactive_at = models.DateTimeField(
+        _("ReActivate Sending OTP"), default=timezone.now
+    )
 
     def __str__(self):
         return self.destination

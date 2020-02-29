@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+
 from .custom_settings import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -33,10 +34,12 @@ INSTALLED_APPS = [
 ] + CUSTOM_APPS
 
 MIDDLEWARE = CUSTOM_MIDDLEWARE + [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     # 'django.middleware.csrf.CsrfViewMiddleware',
+    "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "munsiji.middlewares.TokenMiddlewareFix",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
@@ -66,7 +69,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "HisabKitab.wsgi.application"
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -78,7 +80,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
