@@ -7,7 +7,9 @@ from drfaddons.views import ValidateAndPerformView
 from . import serializers
 from .models import OTPValidation
 from django.contrib.auth import get_user_model
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, ListAPIView
+
+from .serializers import UserProfileSerializer
 
 User = get_user_model()
 
@@ -546,6 +548,19 @@ class UpdateProfileView(UpdateAPIView):
             return JsonResponse(serializer.data, status=status.HTTP_202_ACCEPTED)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfileView(ListAPIView):
+    """
+        This view will list the user details based on the access token
+        get: Lists the single user instance
+    """
+
+    pagination_class = None
+    serializer_class = UserProfileSerializer
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.pk)
 
 
 def about(request):
