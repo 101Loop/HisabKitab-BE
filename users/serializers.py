@@ -164,3 +164,16 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
         model = User
         fields = ("name", "email", "mobile")
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    This serializer is to view the profile of a user.
+    """
+
+    class Meta:
+
+        from .models import User
+
+        model = User
+        fields = ("name", "email", "mobile")
