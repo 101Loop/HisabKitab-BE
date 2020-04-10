@@ -1,5 +1,7 @@
 import datetime
 
+from django.db import IntegrityError
+from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import status
 
 from drfaddons.views import ValidateAndPerformView
@@ -543,9 +545,14 @@ class UpdateProfileView(UpdateAPIView):
 
         serializer = self.UpdateProfileSerializer(request.user, data=request.data)
         if serializer.is_valid():
-            self.perform_update(serializer)
-            request.user.save()
-            return JsonResponse(serializer.data, status=status.HTTP_202_ACCEPTED)
+            try:
+                self.perform_update(serializer)
+                request.user.save()
+                return JsonResponse(
+                    serializer.validated_data, status=status.HTTP_202_ACCEPTED
+                )
+            except IntegrityError:
+                raise ValidationError("This mobile number is already registered")
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
