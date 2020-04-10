@@ -80,6 +80,7 @@ CUSTOM_APPS = [
 # devices = GCMDevice.objects.filter(registration_id=)
 # devices.send_message("Happy name day!")
 
+CUSTOM_MIDDLEWARE = []
 CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = env.list("CORS_ORIGIN_WHITELIST")
 
