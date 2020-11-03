@@ -40,10 +40,7 @@ def check_unique(prop, value):
     True
     """
     user = User.objects.extra(where=[prop + " = '" + value + "'"])
-    if user.count() is not 0:
-        return False
-    else:
-        return True
+    return user.count() is 0
 
 
 def generate_otp(prop, value):
@@ -86,9 +83,8 @@ def generate_otp(prop, value):
 
     # Get or Create new instance of Model with value of provided value and set proper counter.
     otp_object, created = OTPValidation.objects.get_or_create(destination=value)
-    if not created:
-        if otp_object.reactive_at > datetime.datetime.now():
-            return otp_object
+    if not created and otp_object.reactive_at > datetime.datetime.now():
+        return otp_object
 
     otp_object.otp = random_number
     otp_object.type = prop
@@ -272,10 +268,7 @@ def check_validation(value):
     """
     try:
         otp_object = OTPValidation.objects.get(destination=value)
-        if otp_object.is_validated:
-            return True
-        else:
-            return False
+        return bool(otp_object.is_validated)
     except OTPValidation.DoesNotExist:
         return False
 
@@ -294,7 +287,7 @@ class Register(ValidateAndPerformView):
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
         email_validated = True
         mobile_validated = True
-        data = dict()
+        data = {}
 
         if email_validated and mobile_validated:
             user = User.objects.create_user(
@@ -326,10 +319,10 @@ class Register(ValidateAndPerformView):
             send_message(message, subject, [user.email], [user.email])
         else:
             status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-            if not email_validated:
-                data["email"] = ["Provided EMail is not validated!"]
-            if not mobile_validated:
-                data["mobile"] = ["Provided Mobile is not validated!"]
+        if not email_validated:
+            data["email"] = ["Provided EMail is not validated!"]
+        if not mobile_validated:
+            data["mobile"] = ["Provided Mobile is not validated!"]
 
         return data, status_code
 

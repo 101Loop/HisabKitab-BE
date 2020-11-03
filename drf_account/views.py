@@ -82,21 +82,14 @@ class AddDebitCardView(CreateAPIView):
     def perform_create(self, serializer):
         from .models import BankMaster, BankAccount
 
-        if "account" in serializer.validated_data.keys():
-            if serializer.validated_data["account"]:
-                account_obj = BankAccount.objects.get(
-                    pk=serializer.validated_data["account"]
-                )
-                serializer.validated_data["bank"] = account_obj.bank
-            else:
-                bank = serializer.validated_data["bank"]
-                bank_master = get_bank_by_name(bank)
-                if not bank_master:
-                    bank_master = BankMaster()
-                    bank_master.name = bank
-                    bank_master.created_by = self.request.user
-                    bank_master.save()
-                serializer.validated_data["bank"] = bank_master
+        if (
+            "account" in serializer.validated_data.keys()
+            and serializer.validated_data["account"]
+        ):
+            account_obj = BankAccount.objects.get(
+                pk=serializer.validated_data["account"]
+            )
+            serializer.validated_data["bank"] = account_obj.bank
         else:
             bank = serializer.validated_data["bank"]
             bank_master = get_bank_by_name(bank)
@@ -106,7 +99,6 @@ class AddDebitCardView(CreateAPIView):
                 bank_master.created_by = self.request.user
                 bank_master.save()
             serializer.validated_data["bank"] = bank_master
-
         serializer.save(created_by=self.request.user)
 
 
