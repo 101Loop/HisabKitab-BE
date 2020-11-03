@@ -32,10 +32,10 @@ class ContactDetail(CreateUpdateModel):
         # TODO: Handle following situation in better way.
         if not email_user and not mobile_user:
             return email_user or mobile_user
-        elif email_user and not mobile_user:
+        elif not mobile_user:
             # TODO: Why mobile of contact and user is not same?
             return email_user or mobile_user
-        elif not email_user and mobile_user:
+        elif not email_user:
             # TODO: Why mobile of contact and user is not same?
             return email_user or mobile_user
         else:

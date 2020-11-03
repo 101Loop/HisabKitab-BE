@@ -1,16 +1,15 @@
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
-from rest_framework.exceptions import ValidationError
-from rest_framework.mixins import status
-
 from drfaddons.views import ValidateAndPerformView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import UpdateAPIView
+from rest_framework.mixins import status
 
 from . import serializers
 from .models import OTPValidation
-from django.contrib.auth import get_user_model
-from rest_framework.generics import UpdateAPIView, ListAPIView
-
 from .serializers import UserProfileSerializer
 
 User = get_user_model()
@@ -40,10 +39,7 @@ def check_unique(prop, value):
     True
     """
     user = User.objects.extra(where=[prop + " = '" + value + "'"])
-    if user.count() is not 0:
-        return False
-    else:
-        return True
+    return user.count() is 0
 
 
 def generate_otp(prop, value):
@@ -86,9 +82,8 @@ def generate_otp(prop, value):
 
     # Get or Create new instance of Model with value of provided value and set proper counter.
     otp_object, created = OTPValidation.objects.get_or_create(destination=value)
-    if not created:
-        if otp_object.reactive_at > datetime.datetime.now():
-            return otp_object
+    if not created and otp_object.reactive_at > datetime.datetime.now():
+        return otp_object
 
     otp_object.otp = random_number
     otp_object.type = prop
@@ -200,9 +195,10 @@ def send_otp(prop, value, otpobj, recip):
     rdata = {"success": False, "message": None}
 
     if otpobj.reactive_at > datetime.datetime.now():
-        rdata["message"] = (
-            "OTP sending not allowed until: "
-            + otpobj.reactive_at.strftime("%d-%h-%Y %H:%M:%S")
+        rdata[
+            "message"
+        ] = "OTP sending not allowed until: " + otpobj.reactive_at.strftime(
+            "%d-%h-%Y %H:%M:%S"
         )
         return rdata
 
@@ -272,10 +268,7 @@ def check_validation(value):
     """
     try:
         otp_object = OTPValidation.objects.get(destination=value)
-        if otp_object.is_validated:
-            return True
-        else:
-            return False
+        return bool(otp_object.is_validated)
     except OTPValidation.DoesNotExist:
         return False
 
@@ -294,7 +287,7 @@ class Register(ValidateAndPerformView):
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
         email_validated = True
         mobile_validated = True
-        data = dict()
+        data = {}
 
         if email_validated and mobile_validated:
             user = User.objects.create_user(
@@ -326,10 +319,10 @@ class Register(ValidateAndPerformView):
             send_message(message, subject, [user.email], [user.email])
         else:
             status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-            if not email_validated:
-                data["email"] = ["Provided EMail is not validated!"]
-            if not mobile_validated:
-                data["mobile"] = ["Provided Mobile is not validated!"]
+        if not email_validated:
+            data["email"] = ["Provided EMail is not validated!"]
+        if not mobile_validated:
+            data["mobile"] = ["Provided Mobile is not validated!"]
 
         return data, status_code
 
@@ -559,8 +552,8 @@ class UpdateProfileView(UpdateAPIView):
 
 class UserProfileView(ListAPIView):
     """
-        This view will list the user details based on the access token
-        get: Lists the single user instance
+    This view will list the user details based on the access token
+    get: Lists the single user instance
     """
 
     pagination_class = None

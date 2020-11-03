@@ -20,5 +20,4 @@ class TokenMiddlewareFix(object):
                 request.META["HTTP_AUTHORIZATION"] = "Bearer {}".format(token)
         except (ValueError, AttributeError):
             pass
-        response = self.get_response(request)
-        return response
+        return self.get_response(request)
