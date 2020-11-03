@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import TransactionMode, TransactionDetail
+
+from .models import TransactionDetail
+from .models import TransactionMode
 
 
 class MyModelAdmin(admin.ModelAdmin):

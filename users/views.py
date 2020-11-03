@@ -1,16 +1,15 @@
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError
-from rest_framework.exceptions import ValidationError
-from rest_framework.mixins import status
-
 from drfaddons.views import ValidateAndPerformView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import UpdateAPIView
+from rest_framework.mixins import status
 
 from . import serializers
 from .models import OTPValidation
-from django.contrib.auth import get_user_model
-from rest_framework.generics import UpdateAPIView, ListAPIView
-
 from .serializers import UserProfileSerializer
 
 User = get_user_model()
@@ -196,9 +195,10 @@ def send_otp(prop, value, otpobj, recip):
     rdata = {"success": False, "message": None}
 
     if otpobj.reactive_at > datetime.datetime.now():
-        rdata["message"] = (
-            "OTP sending not allowed until: "
-            + otpobj.reactive_at.strftime("%d-%h-%Y %H:%M:%S")
+        rdata[
+            "message"
+        ] = "OTP sending not allowed until: " + otpobj.reactive_at.strftime(
+            "%d-%h-%Y %H:%M:%S"
         )
         return rdata
 
@@ -552,8 +552,8 @@ class UpdateProfileView(UpdateAPIView):
 
 class UserProfileView(ListAPIView):
     """
-        This view will list the user details based on the access token
-        get: Lists the single user instance
+    This view will list the user details based on the access token
+    get: Lists the single user instance
     """
 
     pagination_class = None

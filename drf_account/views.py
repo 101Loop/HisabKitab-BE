@@ -1,4 +1,6 @@
-from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import UpdateAPIView
 
 
 def get_bank_by_name(name):

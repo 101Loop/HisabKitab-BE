@@ -1,4 +1,5 @@
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.generics import ListAPIView
 
 
 class ShowContacts(ListAPIView):

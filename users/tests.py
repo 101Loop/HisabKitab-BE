@@ -1,6 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APITestCase
-from django.contrib.auth import get_user_model
 
 
 user1 = get_user_model().objects.create_user(

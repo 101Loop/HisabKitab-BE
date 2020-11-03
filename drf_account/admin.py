@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import BankMaster, BankAccount, CreditCard, DebitCard
+
+from .models import BankAccount
+from .models import BankMaster
+from .models import CreditCard
+from .models import DebitCard
 
 
 admin.site.register(BankAccount)
