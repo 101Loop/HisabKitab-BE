@@ -7,6 +7,8 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
@@ -202,5 +204,25 @@ sentry_sdk.init(
     release=env("SENTRY_RELEASE"),
     traces_sample_rate=float(env("TRACE_SAMPLE_RATE")),
     send_default_pii=True,
-    _experiments={"auto_enabling_integrations": True},
 )
+
+# Database
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+if env.bool("USE_SQLITE", default=False):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": env("DB_ENGINE"),
+            "NAME": env("DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASSWORD"),
+            "PORT": env("DB_PORT"),
+            "HOST": env("DB_HOST"),
+        }
+    }
