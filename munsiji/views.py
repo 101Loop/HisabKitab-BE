@@ -25,17 +25,7 @@ def add_trans(user, amount, name, trans_date, mode, category, purpose=None):
     td.category = category
     td.mode = TransactionMode.objects.get(pk=mode)
     td.save()
-    return (
-        "%s, your %s transaction of %s amount toward %s done on %s via %s has been recorded."
-        % (
-            td.created_by.name,
-            td.get_category_display(),
-            td.amount,
-            td.contact.name,
-            td.transaction_date,
-            td.mode.mode,
-        )
-    )
+    return f"{td.created_by.name}, your {td.get_category_display()} transaction of {td.amount} amount toward {td.contact.name} done on {td.transaction_date} via {td.mode.mode} has been recorded."
 
 
 def future_value(p: float, r: float, t: float, freq: str, lumpsum=False):
@@ -46,7 +36,7 @@ def future_value(p: float, r: float, t: float, freq: str, lumpsum=False):
     fv = fv / r
     fv = fv * (1 + r)
     fv = fv * p
-    return "Your future value will be approximately %s." % round(fv, 2)
+    return f"Your future value will be approximately {round(fv, 2)}."
 
 
 class MunsiJiCall(APIView):
