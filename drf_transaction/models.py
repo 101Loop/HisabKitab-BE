@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.text import gettext_lazy as _
 from drfaddons.models import CreateUpdateModel
 
+from drf_contact.models import ContactDetail
+
 
 class TransactionMode(CreateUpdateModel):
     """
@@ -23,8 +25,6 @@ class TransactionDetail(CreateUpdateModel):
     A custom TransactionDetails model that keeps a record of all the transaction details.
     """
 
-    from drf_contact.models import ContactDetail
-
     contact = models.ForeignKey(ContactDetail, on_delete=models.PROTECT)
     category = models.CharField(
         _("Category"), choices=[("C", "Credit"), ("D", "Debit")], max_length=6
@@ -35,7 +35,7 @@ class TransactionDetail(CreateUpdateModel):
     comments = models.TextField(_("Comments"), null=True, blank=True)
 
     def __str__(self):
-        return str(self.amount) + "|" + str(self.created_by.name)
+        return f"{str(self.amount)}|{str(self.created_by.name)}"
 
     class Meta:
         verbose_name = _("Transaction Detail")

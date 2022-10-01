@@ -1,10 +1,9 @@
 from rest_framework.generics import CreateAPIView
 
+from fcm_notification.serializers import FCMTokenSerializer
+
 
 class FCMTokenApi(CreateAPIView):
-
-    from .serializers import FCMTokenSerializer
-
     serializer_class = FCMTokenSerializer
 
     def perform_create(self, serializer):
