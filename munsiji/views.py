@@ -25,13 +25,16 @@ def add_trans(user, amount, name, trans_date, mode, category, purpose=None):
     td.category = category
     td.mode = TransactionMode.objects.get(pk=mode)
     td.save()
-    return "%s, your %s transaction of %s amount toward %s done on %s via %s has been recorded." % (
-        td.created_by.name,
-        td.get_category_display(),
-        td.amount,
-        td.contact.name,
-        td.transaction_date,
-        td.mode.mode,
+    return (
+        "%s, your %s transaction of %s amount toward %s done on %s via %s has been recorded."
+        % (
+            td.created_by.name,
+            td.get_category_display(),
+            td.amount,
+            td.contact.name,
+            td.transaction_date,
+            td.mode.mode,
+        )
     )
 
 
