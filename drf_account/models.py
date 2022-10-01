@@ -1,3 +1,6 @@
+import json
+
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.text import gettext_lazy as _
 from drfaddons.models import CreateUpdateModel
@@ -13,12 +16,7 @@ class BankMaster(CreateUpdateModel):
 
     @property
     def bank_aliases(self):
-        import json
-
-        if self.aliases:
-            return json.loads(self.aliases)
-        else:
-            return None
+        return json.loads(self.aliases) if self.aliases else None
 
     def __str__(self):
         return self.name
@@ -67,7 +65,7 @@ class Card(CreateUpdateModel):
     )
 
     def __str__(self):
-        return str(self.nickname) + ", " + self.bank.name
+        return f"{str(self.nickname)}, {self.bank.name}"
 
     class Meta:
         unique_together = ("nickname", "created_by")
@@ -79,8 +77,6 @@ class CreditCard(Card):
     This is a custom Card model that keeps a record of all the credit card details.
     It has a foreign key linking to card.
     """
-
-    from django.core.validators import MinValueValidator, MaxValueValidator
 
     limit = models.DecimalField(_("Limit on Card"), max_digits=50, decimal_places=5)
     statement_date = models.IntegerField(

@@ -1,5 +1,8 @@
 from rest_framework import serializers
 
+from drf_contact.serializers import ShowContactDetailSerializer
+from drf_transaction.models import TransactionMode, TransactionDetail
+
 
 class ShowModeSerializer(serializers.ModelSerializer):
     """
@@ -12,8 +15,6 @@ class ShowModeSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        from .models import TransactionMode
-
         model = TransactionMode
         fields = ("id", "mode")
         read_only_fields = ("id", "mode")
@@ -37,7 +38,6 @@ class AddTransactionDetailsSerializer(serializers.ModelSerializer):
     contact = serializers.CharField(required=True, max_length=254)
 
     class Meta:
-        from .models import TransactionDetail
 
         model = TransactionDetail
         fields = (
@@ -55,15 +55,11 @@ class ShowTransactionDetailsSerializer(serializers.ModelSerializer):
     ShowTransactionDetailsSerializer  is a model serializer that shows the attributes of a transaction.
     """
 
-    from drf_contact.serializers import ShowContactDetailSerializer
-
     mode = ShowModeSerializer(many=False)
     contact = ShowContactDetailSerializer(many=False)
     transaction_date = serializers.DateField()
 
     class Meta:
-        from .models import TransactionDetail
-
         model = TransactionDetail
         fields = "__all__"
 
@@ -74,8 +70,6 @@ class DeleteTransactionDetailsSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        from .models import TransactionDetail
-
         model = TransactionDetail
         fields = ("id",)
 
@@ -84,8 +78,6 @@ class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
     """
     It is a model serializer to update a particular transaction.
     """
-
-    from .models import TransactionMode
 
     contact = serializers.CharField(required=False, max_length=254)
     transaction_date = serializers.DateField(required=False)
@@ -96,8 +88,6 @@ class UpdateTransactionDetailsSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        from .models import TransactionDetail
-
         model = TransactionDetail
         fields = (
             "mode",

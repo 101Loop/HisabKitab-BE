@@ -1,3 +1,6 @@
+from django.contrib.auth import get_user_model
+from django.db import models
+from django.utils.text import gettext_lazy as _
 from drfaddons.models import CreateUpdateModel
 
 
@@ -6,16 +9,12 @@ class ContactDetail(CreateUpdateModel):
     A custom ContactDetails model that keeps a record of all the details of a contact.
     """
 
-    from django.utils.text import gettext_lazy as _
-    from django.db import models
-
     name = models.CharField(_("Unique UserName"), max_length=254)
     email = models.EmailField(_("Email Address"), null=True)
     mobile = models.CharField(_("Mobile Number"), max_length=15, null=True)
 
     @property
     def user(self):
-        from django.contrib.auth import get_user_model
 
         usr = get_user_model()
 
@@ -53,7 +52,6 @@ class ContactDetail(CreateUpdateModel):
         return self.name
 
     class Meta:
-        from django.utils.text import gettext_lazy as _
 
         unique_together = ("created_by", "name")
         verbose_name = _("Contact Detail")

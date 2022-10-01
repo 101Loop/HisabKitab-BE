@@ -1,21 +1,33 @@
-from rest_framework.generics import CreateAPIView
-from rest_framework.generics import DestroyAPIView
-from rest_framework.generics import ListAPIView
-from rest_framework.generics import UpdateAPIView
+from django.db.models import Sum
+from django_filters.rest_framework import DjangoFilterBackend
+from drfaddons.filters import IsOwnerFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    UpdateAPIView,
+    DestroyAPIView,
+)
+from rest_framework.parsers import JSONParser
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+
+from drf_contact.models import ContactDetail
+from drf_transaction.filters import RangeFiltering
+from drf_transaction.models import TransactionDetail, TransactionMode
+from drf_transaction.serializers import (
+    AddTransactionDetailsSerializer,
+    ShowTransactionDetailsSerializer,
+    UpdateTransactionDetailsSerializer,
+    ShowModeSerializer,
+    DeleteTransactionDetailsSerializer,
+)
 
 
 class ShowTransactionAmount(ListAPIView):
     """
     This view is to show the details of transactions.
     """
-
-    from .serializers import ShowTransactionDetailsSerializer
-    from drfaddons.filters import IsOwnerFilterBackend
-    from django_filters.rest_framework import DjangoFilterBackend
-    from rest_framework.filters import SearchFilter, OrderingFilter
-    from .filters import RangeFiltering
-    from .models import TransactionDetail
 
     queryset = (
         TransactionDetail.objects.all()
@@ -35,8 +47,6 @@ class ShowTransactionAmount(ListAPIView):
     ordering_fields = ("contact__name", "amount", "transaction_date")
 
     def list(self, request, *args, **kwargs):
-        from django.db.models import Sum
-
         queryset = self.filter_queryset(self.get_queryset())
         total = queryset.aggregate(Sum("amount"))
         page = self.paginate_queryset(queryset)
@@ -56,17 +66,11 @@ class AddTransactionAmount(CreateAPIView):
     This view is to add new transactions.
     """
 
-    from .serializers import AddTransactionDetailsSerializer
-    from rest_framework.parsers import JSONParser
-
     serializer_class = AddTransactionDetailsSerializer
     parser_classes = (JSONParser,)
 
     def perform_create(self, serializer):
-
-        from drf_contact.models import ContactDetail
-
-        contact_obj, create = ContactDetail.objects.get_or_create(
+        contact_obj, _ = ContactDetail.objects.get_or_create(
             name=serializer.validated_data["contact"], created_by=self.request.user
         )
         serializer.validated_data["contact"] = contact_obj
@@ -78,10 +82,6 @@ class DeleteTransactionAmount(DestroyAPIView):
     This view is to delete a transaction.
     """
 
-    from drfaddons.filters import IsOwnerFilterBackend
-    from .serializers import DeleteTransactionDetailsSerializer
-    from .models import TransactionDetail
-
     filter_backends = (IsOwnerFilterBackend,)
     queryset = TransactionDetail.objects.all()
     serializer_class = DeleteTransactionDetailsSerializer
@@ -92,19 +92,13 @@ class UpdateTransactionAmount(UpdateAPIView):
     This view is to update a transaction.
     """
 
-    from .serializers import UpdateTransactionDetailsSerializer
-    from drfaddons.filters import IsOwnerFilterBackend
-    from .models import TransactionDetail
-
     queryset = TransactionDetail.objects.all()
     serializer_class = UpdateTransactionDetailsSerializer
     filter_backends = (IsOwnerFilterBackend,)
 
     def perform_update(self, serializer):
-        from drf_contact.models import ContactDetail
-
         if "contact" in serializer.initial_data.keys():
-            contact_obj, created = ContactDetail.objects.get_or_create(
+            contact_obj, _ = ContactDetail.objects.get_or_create(
                 name=serializer.validated_data["contact"], created_by=self.request.user
             )
             serializer.validated_data["contact"] = contact_obj
@@ -116,10 +110,6 @@ class ShowMode(ListAPIView):
     """
     This view will show all the modes of transaction.
     """
-
-    from .serializers import ShowModeSerializer
-    from .models import TransactionMode
-    from rest_framework.permissions import AllowAny
 
     permission_classes = (AllowAny,)
     queryset = TransactionMode.objects.all().order_by("-create_date")

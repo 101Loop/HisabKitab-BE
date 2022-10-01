@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from drf_account.models import BankAccount, BankMaster, CreditCard, DebitCard
+
 
 class AddBankAccountSerializer(serializers.ModelSerializer):
     """
@@ -12,8 +14,6 @@ class AddBankAccountSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        from .models import BankAccount
-
         model = BankAccount
         fields = ("nickname", "bank", "description", "accnumber")
 
@@ -24,7 +24,6 @@ class ShowBankSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        from .models import BankMaster
 
         model = BankMaster
         fields = ("name", "bank_aliases")
@@ -38,8 +37,6 @@ class ShowBankAccountSerializer(serializers.ModelSerializer):
     bank = ShowBankSerializer(many=False)
 
     class Meta:
-        from .models import BankAccount
-
         model = BankAccount
         fields = (
             "id",
@@ -63,8 +60,6 @@ class AddDebitCardSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        from .models import DebitCard
-
         model = DebitCard
         fields = (
             "nickname",
@@ -91,8 +86,6 @@ class ShowDebitCardSerializer(serializers.ModelSerializer):
         return obj.get_vendor_display()
 
     class Meta:
-        from .models import DebitCard
-
         model = DebitCard
         fields = (
             "id",
@@ -118,8 +111,6 @@ class AddCreditCardSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        from .models import CreditCard
-
         model = CreditCard
         fields = (
             "nickname",
@@ -139,8 +130,6 @@ class ShowCreditCardSerializer(ShowDebitCardSerializer):
     """
 
     class Meta:
-        from .models import CreditCard
-
         model = CreditCard
         fields = (
             "id",
@@ -159,8 +148,6 @@ class UpdateBankAccountSerializer(serializers.ModelSerializer):
     """
     UpdateBankAccountSerializer is a model serializer to update a bank account detail.
     """
-
-    from .models import BankMaster
 
     nickname = serializers.CharField(required=False)
     bank = serializers.PrimaryKeyRelatedField(
@@ -181,8 +168,6 @@ class UpdateDebitCardSerializer(serializers.ModelSerializer):
     """
     UpdateDebitCardSerializer is a model serializer to update debit card details.
     """
-
-    from .models import BankMaster
 
     nickname = serializers.CharField(required=False)
     bank = serializers.PrimaryKeyRelatedField(
@@ -214,8 +199,6 @@ class UpdateCreditCardSerializer(serializers.ModelSerializer):
     UpdateCreditCardSerializer is a model serializer to update Credit card details.
     """
 
-    from .models import BankMaster
-
     nickname = serializers.CharField(required=False)
     bank = serializers.PrimaryKeyRelatedField(
         required=False, queryset=BankMaster.objects.all()
@@ -228,8 +211,6 @@ class UpdateCreditCardSerializer(serializers.ModelSerializer):
     duedate_duration = serializers.IntegerField(required=False)
 
     class Meta:
-        from .models import CreditCard
-
         model = CreditCard
         fields = (
             "nickname",

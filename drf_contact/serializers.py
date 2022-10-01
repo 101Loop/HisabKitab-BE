@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from drf_contact.models import ContactDetail
+
 
 class ShowContactDetailSerializer(serializers.ModelSerializer):
     """
@@ -14,8 +16,6 @@ class ShowContactDetailSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        from .models import ContactDetail
-
         model = ContactDetail
         fields = ("id", "name", "email", "mobile")
 
@@ -32,7 +32,5 @@ class AddContactDetailSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        from .models import ContactDetail
-
         model = ContactDetail
         fields = ("name", "email", "mobile")
