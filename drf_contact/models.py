@@ -29,21 +29,21 @@ class ContactDetail(CreateUpdateModel):
             mobile_user = None
 
         # TODO: Handle following situation in better way.
-        if not email_user and not mobile_user:
-            return email_user or mobile_user
-        elif not mobile_user:
-            # TODO: Why mobile of contact and user is not same?
-            return email_user or mobile_user
-        elif not email_user:
-            # TODO: Why mobile of contact and user is not same?
+        if (
+            (email_user or mobile_user)
+            and mobile_user
+            and email_user
+            and email_user == mobile_user
+            or not email_user
+            and not mobile_user
+            or not mobile_user
+            or not email_user
+        ):
+            # This is ideal case
             return email_user or mobile_user
         else:
-            if email_user == mobile_user:
-                # This is ideal case
-                return email_user or mobile_user
-            else:
-                # TODO: How two users can exist where in the contact is same?
-                return email_user
+            # TODO: How two users can exist where in the contact is same?
+            return email_user
 
     def __str__(self):
         """
