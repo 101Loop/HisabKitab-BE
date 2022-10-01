@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
+from drfaddons.utils import send_message
 from drfaddons.views import ValidateAndPerformView
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
@@ -202,16 +203,12 @@ def send_otp(prop, value, otpobj, recip):
         )
         return rdata
 
+    subject = "OTP for Verification"
+
     message = (
-        "OTP for verifying "
-        + prop
-        + ": "
-        + value
-        + " is "
-        + otp
+        f"OTP for verifying {prop}: {value} is {otp}"
         + ". Don't share this with anyone!"
     )
-    subject = "OTP for Verification"
 
     rdata = send_message(
         message=message, subject=subject, recip_email=[recip], recip=[recip]
@@ -281,8 +278,6 @@ class Register(ValidateAndPerformView):
     serializer_class = serializers.UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from drfaddons.utils import send_message
-
         # email_validated = check_validation(serialized_data.initial_data['email'])
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
         email_validated = True
@@ -394,25 +389,23 @@ class SendOTP(ValidateAndPerformView):
             status_code = status.HTTP_400_BAD_REQUEST
             data = {"value": ["Given value is not Mobile Number!"]}
 
-        else:
-            if check_unique(prop, value):
-                data = {"unique": True}
-                otpobj = generate_otp(prop, value)
+        elif check_unique(prop, value):
+            otpobj = generate_otp(prop, value)
 
-                sentotp = send_otp(
-                    prop, value, otpobj, serialized_data.initial_data["email"]
-                )
+            sentotp = send_otp(
+                prop, value, otpobj, serialized_data.initial_data["email"]
+            )
 
-                data["OTP"] = sentotp["message"]
-                if sentotp["success"]:
-                    otpobj.send_counter += 1
-                    otpobj.save()
-                    status_code = status.HTTP_201_CREATED
-                else:
-                    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            data = {"unique": True, "OTP": sentotp["message"]}
+            if sentotp["success"]:
+                otpobj.send_counter += 1
+                otpobj.save()
+                status_code = status.HTTP_201_CREATED
             else:
-                data = {"unique": False}
-                status_code = status.HTTP_409_CONFLICT
+                status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        else:
+            data = {"unique": False}
+            status_code = status.HTTP_409_CONFLICT
         return data, status_code
 
 
@@ -479,20 +472,20 @@ class LoginOTP(ValidateAndPerformView):
             }
             status_code = status.HTTP_404_NOT_FOUND
 
+        elif otp is None:
+            otp_obj = generate_otp(prop, value)
+            data = send_otp(prop, value, otp_obj, user.email)
+
+            status_code = (
+                status.HTTP_201_CREATED
+                if data["success"]
+                else status.HTTP_400_BAD_REQUEST
+            )
+
         else:
-            if otp is None:
-                otp_obj = generate_otp(prop, value)
-                data = send_otp(prop, value, otp_obj, user.email)
-
-                if data["success"]:
-                    status_code = status.HTTP_201_CREATED
-                else:
-                    status_code = status.HTTP_400_BAD_REQUEST
-
-            else:
-                data, status_code = validate_otp(value, int(otp))
-                if status_code == status.HTTP_202_ACCEPTED:
-                    data, status_code = login_user(user, self.request)
+            data, status_code = validate_otp(value, int(otp))
+            if status_code == status.HTTP_202_ACCEPTED:
+                data, status_code = login_user(user, self.request)
 
         return data, status_code
 
@@ -513,12 +506,11 @@ class ChangePassword(UpdateAPIView):
         from drfaddons.utils import JsonResponse
 
         sdata = self.ForgotPasswordSerializer(data=request.data)
-        if sdata.is_valid():
-            request.user.set_password(sdata.data["new_password"])
-            request.user.save()
-            return JsonResponse({"success": True}, status=status.HTTP_202_ACCEPTED)
-        else:
+        if not sdata.is_valid():
             return JsonResponse(sdata.errors, status=status.HTTP_400_BAD_REQUEST)
+        request.user.set_password(sdata.data["new_password"])
+        request.user.save()
+        return JsonResponse({"success": True}, status=status.HTTP_202_ACCEPTED)
 
 
 class UpdateProfileView(UpdateAPIView):
@@ -537,17 +529,16 @@ class UpdateProfileView(UpdateAPIView):
         from drfaddons.utils import JsonResponse
 
         serializer = self.UpdateProfileSerializer(request.user, data=request.data)
-        if serializer.is_valid():
-            try:
-                self.perform_update(serializer)
-                request.user.save()
-                return JsonResponse(
-                    serializer.validated_data, status=status.HTTP_202_ACCEPTED
-                )
-            except IntegrityError:
-                raise ValidationError("This mobile number is already registered")
-        else:
+        if not serializer.is_valid():
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            self.perform_update(serializer)
+            request.user.save()
+            return JsonResponse(
+                serializer.validated_data, status=status.HTTP_202_ACCEPTED
+            )
+        except IntegrityError:
+            raise ValidationError("This mobile number is already registered")
 
 
 class UserProfileView(ListAPIView):
