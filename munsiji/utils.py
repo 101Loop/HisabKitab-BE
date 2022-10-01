@@ -1,7 +1,6 @@
 import datetime
 
-import iso8601
-
+from dateutil import parser
 from drf_contact.models import ContactDetail
 from drf_transaction.models import TransactionDetail, TransactionMode
 
@@ -18,7 +17,7 @@ def add_trans(user, amount, name, trans_date, mode, category, purpose=None):
     td.amount = amount
     td.contact = contact_obj
     td.comments = purpose
-    td.transaction_date = iso8601.parse_date(trans_date).date()
+    td.transaction_date = parser.parse(trans_date).date()
     td.category = category
     td.mode = TransactionMode.objects.get(pk=mode)
     td.save()
