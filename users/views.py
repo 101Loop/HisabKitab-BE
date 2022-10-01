@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
+from drfaddons.utils import send_message
 from drfaddons.views import ValidateAndPerformView
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
@@ -281,8 +282,6 @@ class Register(ValidateAndPerformView):
     serializer_class = serializers.UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from drfaddons.utils import send_message
-
         # email_validated = check_validation(serialized_data.initial_data['email'])
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
         email_validated = True
