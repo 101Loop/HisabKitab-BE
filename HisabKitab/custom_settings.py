@@ -78,14 +78,14 @@ CORS_ALLOW_METHODS = (
 LOGIN_REDIRECT_URL = "https://hisabkitab.in/login"
 
 AUTHENTICATION_BACKENDS = [
-    "oauth2_provider.backends.OAuth2Backend",
+    # "oauth2_provider.backends.OAuth2Backend",
     "users.auth.MultiFieldModelBackend",
 ]
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        # "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         "drfaddons.auth.JSONWebTokenAuthenticationQS",
     ),
     "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),

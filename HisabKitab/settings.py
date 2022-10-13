@@ -40,8 +40,8 @@ MIDDLEWARE = [
     # 'django.middleware.csrf.CsrfViewMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "munsiji.middlewares.TokenMiddlewareFix",
-    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    # "munsiji.middlewares.TokenMiddlewareFix",
+    # "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
