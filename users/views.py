@@ -454,43 +454,46 @@ class LoginOTP(ValidateAndPerformView):
     serializer_class = serializers.OTPVerify
 
     def validated(self, serialized_data, *args, **kwargs):
-        otp = serialized_data.data["otp"]
-        value = serialized_data.data["value"]
+        from sentry_sdk import start_transaction
 
-        if value.isdigit() or value.startswith("+"):
-            prop = "mobile"
-            try:
-                user = User.objects.get(mobile=value)
-            except User.DoesNotExist:
-                user = None
-        else:
-            prop = "email"
-            try:
-                user = User.objects.get(email=value)
-            except User.DoesNotExist:
-                user = None
+        with start_transaction(op="login", name="LoginWithOTP"):
+            otp = serialized_data.data["otp"]
+            value = serialized_data.data["value"]
 
-        if user is None:
-            data = {
-                "success": False,
-                "message": "No user exists with provided details!",
-            }
-            status_code = status.HTTP_404_NOT_FOUND
+            if value.isdigit() or value.startswith("+"):
+                prop = "mobile"
+                try:
+                    user = User.objects.get(mobile=value)
+                except User.DoesNotExist:
+                    user = None
+            else:
+                prop = "email"
+                try:
+                    user = User.objects.get(email=value)
+                except User.DoesNotExist:
+                    user = None
 
-        elif otp is None:
-            otp_obj = generate_otp(prop, value)
-            data = send_otp(prop, value, otp_obj, user.email)
+            if user is None:
+                data = {
+                    "success": False,
+                    "message": "No user exists with provided details!",
+                }
+                status_code = status.HTTP_404_NOT_FOUND
 
-            status_code = (
-                status.HTTP_201_CREATED
-                if data["success"]
-                else status.HTTP_400_BAD_REQUEST
-            )
+            elif otp is None:
+                otp_obj = generate_otp(prop, value)
+                data = send_otp(prop, value, otp_obj, user.email)
 
-        else:
-            data, status_code = validate_otp(value, int(otp))
-            if status_code == status.HTTP_202_ACCEPTED:
-                data, status_code = login_user(user, self.request)
+                status_code = (
+                    status.HTTP_201_CREATED
+                    if data["success"]
+                    else status.HTTP_400_BAD_REQUEST
+                )
+
+            else:
+                data, status_code = validate_otp(value, int(otp))
+                if status_code == status.HTTP_202_ACCEPTED:
+                    data, status_code = login_user(user, self.request)
 
         return data, status_code
 
