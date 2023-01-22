@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
+from django.db.models import Q
 from drfaddons.utils import send_message
 from drfaddons.views import ValidateAndPerformView
 from rest_framework.exceptions import ValidationError
@@ -203,13 +204,11 @@ def send_otp(prop, value, otpobj, recip):
         )
         return rdata
 
-    subject = "OTP for Verification"
-
     message = (
-        f"OTP for verifying {prop}: {value} is {otp}"
-        + ". Don't share this with anyone!"
+        f"OTP for verifying {prop}: {value} is {otp}. Don't share this with anyone!"
     )
 
+    subject = "OTP for Verification"
     rdata = send_message(
         message=message, subject=subject, recip_email=[recip], recip=[recip]
     )
@@ -278,7 +277,6 @@ class Register(ValidateAndPerformView):
     serializer_class = serializers.UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
-        from sentry_sdk import start_transaction
 
         # email_validated = check_validation(serialized_data.initial_data['email'])
         # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
@@ -286,8 +284,9 @@ class Register(ValidateAndPerformView):
         mobile_validated = True
         data = {}
 
-        with start_transaction(op="register", name="RegisterEndpoint"):
-            if email_validated and mobile_validated:
+        if email_validated and mobile_validated:
+            try:
+                is_new = True
                 user = User.objects.create_user(
                     username=serialized_data.initial_data["username"],
                     email=serialized_data.initial_data["email"],
@@ -296,14 +295,22 @@ class Register(ValidateAndPerformView):
                     mobile=serialized_data.initial_data["mobile"],
                     is_active=True,
                 )
-                data = {
-                    "name": user.get_full_name(),
-                    "username": user.get_username(),
-                    "id": user.id,
-                    "email": user.email,
-                    "mobile": user.mobile,
-                }
-                status_code = status.HTTP_201_CREATED
+            except IntegrityError:
+                is_new = False
+                user = User.objects.get(
+                    Q(email=serialized_data.initial_data["email"])
+                    | Q(mobile=serialized_data.initial_data["mobile"])
+                )
+
+            data = {
+                "name": user.get_full_name(),
+                "username": user.get_username(),
+                "id": user.id,
+                "email": user.email,
+                "mobile": user.mobile,
+            }
+            status_code = status.HTTP_201_CREATED
+            if is_new:
                 subject = "New account created | Hisab Kitab (v 0.1 b1)"
                 message = """You've created an account with Hisab Kitab.
                 Your account activation is subject to Administrator approval.
@@ -315,12 +322,12 @@ class Register(ValidateAndPerformView):
                 Thank You!
                 """
                 send_message(message, subject, [user.email], [user.email])
-            else:
-                status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-            if not email_validated:
-                data["email"] = ["Provided EMail is not validated!"]
-            if not mobile_validated:
-                data["mobile"] = ["Provided Mobile is not validated!"]
+        else:
+            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        if not email_validated:
+            data["email"] = ["Provided EMail is not validated!"]
+        if not mobile_validated:
+            data["mobile"] = ["Provided Mobile is not validated!"]
 
         return data, status_code
 
@@ -338,20 +345,18 @@ class Login(ValidateAndPerformView):
 
     def validated(self, serialized_data, **kwargs):
         from django.contrib.auth import authenticate
-        from sentry_sdk import start_transaction
 
-        with start_transaction(op="login", name="LoginEndpoint"):
-            user = authenticate(
-                username=serialized_data.initial_data["username"],
-                password=serialized_data.initial_data["password"],
-            )
+        user = authenticate(
+            username=serialized_data.initial_data["username"],
+            password=serialized_data.initial_data["password"],
+        )
 
-            if user is not None:
-                data, status_code = login_user(user, kwargs.get("request"))
+        if user is not None:
+            data, status_code = login_user(user, kwargs.get("request"))
 
-            else:
-                data = {"message": "User not found/Password combination wrong"}
-                status_code = status.HTTP_401_UNAUTHORIZED
+        else:
+            data = {"message": "User not found/Password combination wrong"}
+            status_code = status.HTTP_401_UNAUTHORIZED
 
         return data, status_code
 
@@ -454,46 +459,43 @@ class LoginOTP(ValidateAndPerformView):
     serializer_class = serializers.OTPVerify
 
     def validated(self, serialized_data, *args, **kwargs):
-        from sentry_sdk import start_transaction
+        otp = serialized_data.data["otp"]
+        value = serialized_data.data["value"]
 
-        with start_transaction(op="login", name="LoginWithOTP"):
-            otp = serialized_data.data["otp"]
-            value = serialized_data.data["value"]
+        if value.isdigit() or value.startswith("+"):
+            prop = "mobile"
+            try:
+                user = User.objects.get(mobile=value)
+            except User.DoesNotExist:
+                user = None
+        else:
+            prop = "email"
+            try:
+                user = User.objects.get(email=value)
+            except User.DoesNotExist:
+                user = None
 
-            if value.isdigit() or value.startswith("+"):
-                prop = "mobile"
-                try:
-                    user = User.objects.get(mobile=value)
-                except User.DoesNotExist:
-                    user = None
-            else:
-                prop = "email"
-                try:
-                    user = User.objects.get(email=value)
-                except User.DoesNotExist:
-                    user = None
+        if user is None:
+            data = {
+                "success": False,
+                "message": "No user exists with provided details!",
+            }
+            status_code = status.HTTP_404_NOT_FOUND
 
-            if user is None:
-                data = {
-                    "success": False,
-                    "message": "No user exists with provided details!",
-                }
-                status_code = status.HTTP_404_NOT_FOUND
+        elif otp is None:
+            otp_obj = generate_otp(prop, value)
+            data = send_otp(prop, value, otp_obj, user.email)
 
-            elif otp is None:
-                otp_obj = generate_otp(prop, value)
-                data = send_otp(prop, value, otp_obj, user.email)
+            status_code = (
+                status.HTTP_201_CREATED
+                if data["success"]
+                else status.HTTP_400_BAD_REQUEST
+            )
 
-                status_code = (
-                    status.HTTP_201_CREATED
-                    if data["success"]
-                    else status.HTTP_400_BAD_REQUEST
-                )
-
-            else:
-                data, status_code = validate_otp(value, int(otp))
-                if status_code == status.HTTP_202_ACCEPTED:
-                    data, status_code = login_user(user, self.request)
+        else:
+            data, status_code = validate_otp(value, int(otp))
+            if status_code == status.HTTP_202_ACCEPTED:
+                data, status_code = login_user(user, self.request)
 
         return data, status_code
 
