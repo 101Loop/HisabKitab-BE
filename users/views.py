@@ -40,7 +40,7 @@ def check_unique(prop, value):
     >>> print(check_unique('email', 'test@testing.com'))
     True
     """
-    user = User.objects.extra(where=[prop + " = '" + value + "'"])
+    user = User.objects.extra(where=[f"{prop} = '{value}'"])
     return user.count() is 0
 
 
