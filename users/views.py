@@ -41,7 +41,7 @@ def check_unique(prop, value):
     True
     """
     user = User.objects.extra(where=[f"{prop} = '{value}'"])
-    return user.count() is 0
+    return user.count() == 0
 
 
 def generate_otp(prop, value):
@@ -391,11 +391,11 @@ class SendOTP(ValidateAndPerformView):
 
         prop = serialized_data.initial_data["prop"]
         value = serialized_data.initial_data["value"]
-        if prop is "email" and not validate_email(value):
+        if prop == "email" and not validate_email(value):
             status_code = status.HTTP_400_BAD_REQUEST
             data = {"value": ["Given value is not an EMail ID!"]}
 
-        elif prop is "mobile" and not validate_mobile(value):
+        elif prop == "mobile" and not validate_mobile(value):
             status_code = status.HTTP_400_BAD_REQUEST
             data = {"value": ["Given value is not Mobile Number!"]}
 

@@ -22,8 +22,6 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from usersettings.views import ChangeSettingsView
-
 schema_view = get_schema_view(
     openapi.Info(
         title="HisabKitab API",
@@ -42,8 +40,6 @@ urlpatterns = [
     path("api/transactions/", include("drf_transaction.urls")),
     path("api/contacts/", include("drf_contact.urls")),
     path("api/account/", include("drf_account.urls")),
-    path("api/usersetting/", ChangeSettingsView.as_view(), name="Change User Settings"),
-    path("munsiji/", include("munsiji.urls")),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=None),
@@ -61,6 +57,5 @@ urlpatterns = [
     path(
         "jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")
     ),  # Django JET dashboard URLS
-    path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("", admin.site.urls),
 ]
