@@ -145,6 +145,9 @@ sentry_sdk.init(
     release=env("SENTRY_RELEASE"),
     traces_sample_rate=float(env("TRACE_SAMPLE_RATE")),
     send_default_pii=True,
+    _experiments={
+        "profiles_sample_rate": 1.0,
+    },
 )
 
 # Database
