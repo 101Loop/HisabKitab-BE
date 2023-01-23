@@ -40,32 +40,17 @@ EMAIL_FROM = env("DEFAULT_FROM_EMAIL")
 DEFAULT_FROM_EMAIL = EMAIL_FROM
 
 CUSTOM_APPS = [
-    "usersettings",
     "drf_account",
     "drf_contact",
     "users.apps.UsersConfig",
     "drf_transaction",
     "corsheaders",
-    "oauth2_provider",
     "drfaddons",
     "drf_yasg",
-    "munsiji",
-    "fcm_notification",
 ]
-
-# FCM_DJANGO_SETTINGS = {
-#         "FCM_SERVER_KEY": "[your api key]"
-# }
-#
-# from push_notifications.models import GCMDevice
-# devices = GCMDevice.objects.filter(registration_id=)
-# devices.send_message("Happy name day!")
 
 CUSTOM_MIDDLEWARE = []
 CORS_ORIGIN_ALLOW_ALL = True
-# CORS_ORIGIN_WHITELIST = env.list("CORS_ORIGIN_WHITELIST")
-
-# CSRF_TRUSTED_ORIGINS = CORS_ORIGIN_WHITELIST
 
 CORS_ALLOW_METHODS = (
     "GET",
@@ -78,16 +63,12 @@ CORS_ALLOW_METHODS = (
 LOGIN_REDIRECT_URL = "https://hisabkitab.in/login"
 
 AUTHENTICATION_BACKENDS = [
-    # "oauth2_provider.backends.OAuth2Backend",
     "users.auth.MultiFieldModelBackend",
 ]
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        # "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
-        "drfaddons.auth.JSONWebTokenAuthenticationQS",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("drfaddons.auth.JSONWebTokenAuthenticationQS",),
     "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -147,46 +128,6 @@ JET_THEMES = [
     {"theme": "light-blue", "color": "#5EADDE", "title": "Light Blue"},
     {"theme": "light-gray", "color": "#222", "title": "Light Gray"},
 ]
-
-
-# LOGGING
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#logging
-# See https://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": True,
-    "formatters": {
-        "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(process)d %(thread)d %(message)s"
-        }
-    },
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
-        }
-    },
-    "root": {"level": "INFO", "handlers": ["console"]},
-    "loggers": {
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
-        # Errors logged by the SDK itself
-        "sentry_sdk": {"level": "ERROR", "handlers": ["console"], "propagate": False},
-        "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": ["console"],
-            "propagate": False,
-        },
-    },
-}
 
 # Sentry
 # ------------------------------------------------------------------------------
