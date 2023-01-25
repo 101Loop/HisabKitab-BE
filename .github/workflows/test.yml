@@ -28,6 +28,6 @@ jobs:
           pip install -r requirements.txt
       - name: Generate Report
         run: |
-          coverage run manage.py test --settings=HisabKitab.test_settings
+          coverage run --branch manage.py test --settings=HisabKitab.test_settings
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
