@@ -7,11 +7,12 @@ class RangeFiltering(FilterSet):
     """
 
     from django_filters.rest_framework import (
-        NumberFilter,
-        ModelMultipleChoiceFilter,
         CharFilter,
         DateFilter,
+        ModelMultipleChoiceFilter,
+        NumberFilter,
     )
+
     from .models import TransactionMode
 
     start_date = DateFilter(field_name="transaction_date", lookup_expr="gte")
