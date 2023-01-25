@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from drfaddons.filters import IsOwnerFilterBackend
@@ -71,7 +72,7 @@ class AddTransactionAmount(CreateAPIView):
     parser_classes = (JSONParser,)
 
     def perform_create(self, serializer):
-        contact_obj, _ = ContactDetail.objects.get_or_create(
+        contact_obj, _ = ContactDetail.objects.only("id").get_or_create(
             name=serializer.validated_data["contact"], created_by=self.request.user
         )
         serializer.validated_data["contact"] = contact_obj
