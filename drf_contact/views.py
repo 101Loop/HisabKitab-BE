@@ -9,8 +9,8 @@ from rest_framework.renderers import JSONRenderer
 
 from drf_contact.models import ContactDetail
 from drf_contact.serializers import (
-    ShowContactDetailSerializer,
     AddContactDetailSerializer,
+    ShowContactDetailSerializer,
 )
 
 

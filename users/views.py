@@ -6,8 +6,7 @@ from django.db.models import Q
 from drfaddons.utils import send_message
 from drfaddons.views import ValidateAndPerformView
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import ListAPIView
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView
 from rest_framework.mixins import status
 
 from . import serializers
@@ -222,9 +221,9 @@ def send_otp(prop, value, otpobj, recip):
 
 def login_user(user: User, request) -> (dict, int):
 
-    from rest_framework_jwt.utils import jwt_payload_handler
     from drfaddons.utils import get_client_ip
-    from rest_framework_jwt.utils import jwt_encode_handler
+    from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
+
     from .models import AuthTransaction
 
     token = jwt_encode_handler(jwt_payload_handler(user))
@@ -338,8 +337,8 @@ class Login(ValidateAndPerformView):
     In 'username' user can provide either username or mobile or email address.
     """
 
-    from rest_framework_jwt.serializers import JSONWebTokenSerializer
     from django.views.decorators.csrf import csrf_exempt
+    from rest_framework_jwt.serializers import JSONWebTokenSerializer
 
     serializer_class = JSONWebTokenSerializer
 
@@ -505,8 +504,8 @@ class ChangePassword(UpdateAPIView):
     This view will let the user to change the password.
     """
 
-    from .serializers import ForgotPasswordSerializer
     from .models import User
+    from .serializers import ForgotPasswordSerializer
 
     queryset = User.objects.all()
     serializer_class = ForgotPasswordSerializer
@@ -528,8 +527,8 @@ class UpdateProfileView(UpdateAPIView):
     This view is to update a user profile.
     """
 
-    from .serializers import UpdateProfileSerializer
     from .models import User
+    from .serializers import UpdateProfileSerializer
 
     queryset = User.objects.all()
     serializer_class = UpdateProfileSerializer

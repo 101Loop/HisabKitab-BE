@@ -1,8 +1,8 @@
+from unittest import mock
 from unittest.mock import MagicMock
 
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from unittest import mock
 
 from users.models import User
 

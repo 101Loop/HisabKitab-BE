@@ -1,13 +1,12 @@
-from django.db import transaction
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from drfaddons.filters import IsOwnerFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import (
     CreateAPIView,
+    DestroyAPIView,
     ListAPIView,
     UpdateAPIView,
-    DestroyAPIView,
 )
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
@@ -18,10 +17,10 @@ from drf_transaction.filters import RangeFiltering
 from drf_transaction.models import TransactionDetail, TransactionMode
 from drf_transaction.serializers import (
     AddTransactionDetailsSerializer,
+    DeleteTransactionDetailsSerializer,
+    ShowModeSerializer,
     ShowTransactionDetailsSerializer,
     UpdateTransactionDetailsSerializer,
-    ShowModeSerializer,
-    DeleteTransactionDetailsSerializer,
 )
 
 
@@ -100,7 +99,7 @@ class UpdateTransactionAmount(UpdateAPIView):
 
     def perform_update(self, serializer):
         if "contact" in serializer.initial_data.keys():
-            contact_obj, _ = ContactDetail.objects.get_or_create(
+            contact_obj, _ = ContactDetail.objects.only("id").get_or_create(
                 name=serializer.validated_data["contact"], created_by=self.request.user
             )
             serializer.validated_data["contact"] = contact_obj

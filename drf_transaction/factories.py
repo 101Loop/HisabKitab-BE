@@ -1,12 +1,13 @@
 import random
-from django.utils import timezone
+
 import factory
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from faker import Faker
 
 from drf_contact.factories import ContactDetailFactory
+from drf_transaction.models import TransactionDetail, TransactionMode
 from users.factories import UserFactory
-from drf_transaction.models import TransactionMode, TransactionDetail
 
 User = get_user_model()
 
