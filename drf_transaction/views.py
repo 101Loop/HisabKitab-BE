@@ -30,7 +30,8 @@ class ShowTransactionAmount(ListAPIView):
     """
 
     queryset = (
-        TransactionDetail.objects.all()
+        TransactionDetail.objects.select_related("contact", "mode")
+        .all()
         .order_by("-transaction_date")
         .order_by("-create_date")
     )
