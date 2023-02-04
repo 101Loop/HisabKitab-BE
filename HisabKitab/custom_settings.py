@@ -175,7 +175,7 @@ else:
 # HUEY
 HUEY = {
     "name": "HisabKitab",
-    "url": env("REDIS_URL"),
+    "url": env.str("REDIS_URL"),
     "immediate": DEBUG,
     "utc": False,
     "consumer": {
