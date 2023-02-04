@@ -3,7 +3,6 @@ import datetime
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.db.models import Q
-from drfaddons.utils import send_message
 from drfaddons.views import ValidateAndPerformView
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, UpdateAPIView
@@ -12,6 +11,7 @@ from rest_framework.mixins import status
 from . import serializers
 from .models import OTPValidation
 from .serializers import UserProfileSerializer
+from .tasks import send_welcome_email_async
 
 User = get_user_model()
 
@@ -276,57 +276,32 @@ class Register(ValidateAndPerformView):
     serializer_class = serializers.UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
+        email = serialized_data.initial_data["email"]
+        mobile = serialized_data.initial_data["mobile"]
+        try:
+            is_new = True
+            user = User.objects.create_user(
+                username=serialized_data.initial_data["username"],
+                email=email,
+                name=serialized_data.initial_data["name"],
+                password=serialized_data.initial_data["password"],
+                mobile=mobile,
+                is_active=True,
+            )
+        except IntegrityError:
+            is_new = False
+            user = User.objects.get(Q(email=email) | Q(mobile=mobile))
 
-        # email_validated = check_validation(serialized_data.initial_data['email'])
-        # mobile_validated = check_validation(serialized_data.initial_data['mobile'])
-        email_validated = True
-        mobile_validated = True
-        data = {}
-
-        if email_validated and mobile_validated:
-            try:
-                is_new = True
-                user = User.objects.create_user(
-                    username=serialized_data.initial_data["username"],
-                    email=serialized_data.initial_data["email"],
-                    name=serialized_data.initial_data["name"],
-                    password=serialized_data.initial_data["password"],
-                    mobile=serialized_data.initial_data["mobile"],
-                    is_active=True,
-                )
-            except IntegrityError:
-                is_new = False
-                user = User.objects.get(
-                    Q(email=serialized_data.initial_data["email"])
-                    | Q(mobile=serialized_data.initial_data["mobile"])
-                )
-
-            data = {
-                "name": user.get_full_name(),
-                "username": user.get_username(),
-                "id": user.id,
-                "email": user.email,
-                "mobile": user.mobile,
-            }
-            status_code = status.HTTP_201_CREATED
-            if is_new:
-                subject = "New account created | Hisab Kitab (v 0.1 b1)"
-                message = """You've created an account with Hisab Kitab.
-                Your account activation is subject to Administrator approval.
-                Our Administrator may call you for verification.
-
-                This app is a product of Vitartha, a StartUp focusing on Financially aware India.
-                Vitartha will also like to thank M/s Civil Machines Technologies Private Limited for the technical
-                production & development of this app.
-                Thank You!
-                """
-                send_message(message, subject, [user.email], [user.email])
-        else:
-            status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-        if not email_validated:
-            data["email"] = ["Provided EMail is not validated!"]
-        if not mobile_validated:
-            data["mobile"] = ["Provided Mobile is not validated!"]
+        data = {
+            "name": user.get_full_name(),
+            "username": user.get_username(),
+            "id": user.id,
+            "email": user.email,
+            "mobile": user.mobile,
+        }
+        status_code = status.HTTP_201_CREATED
+        if is_new:
+            send_welcome_email_async(user.email)
 
         return data, status_code
 
