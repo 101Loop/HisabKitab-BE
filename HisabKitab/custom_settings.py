@@ -5,8 +5,8 @@ import os
 import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.redis import RedisIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -48,7 +48,7 @@ CUSTOM_APPS = [
     "corsheaders",
     "drfaddons",
     "drf_yasg",
-    'huey.contrib.djhuey',
+    "huey.contrib.djhuey",
 ]
 
 CUSTOM_MIDDLEWARE = []
