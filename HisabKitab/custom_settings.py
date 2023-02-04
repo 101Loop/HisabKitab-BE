@@ -188,7 +188,7 @@ HUEY = {
 WELCOME_EMAIL_SUBJECT = "New account created | Hisab Kitab"
 WELCOME_EMAIL_BODY = """You've successfully created an account on Hisab Kitab. Thank you for
 choosing us. We hope you have a great experience with us. If you have any queries,
-please create an issue on our GitHub repository at https://github.com/101Loop/HisabKitab-BE.
+please create an issue on our GitHub repository at https://github.com/101Loop/HisabKitab-BE/issues
 We will try to resolve it as soon as possible. Thank you!
 
 This app is a product of Vitartha, a StartUp focusing on Financially aware India.
