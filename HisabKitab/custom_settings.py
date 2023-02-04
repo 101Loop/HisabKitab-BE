@@ -6,6 +6,7 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -47,6 +48,7 @@ CUSTOM_APPS = [
     "corsheaders",
     "drfaddons",
     "drf_yasg",
+    "huey.contrib.djhuey",
 ]
 
 CUSTOM_MIDDLEWARE = []
@@ -112,7 +114,6 @@ USE_TZ = False
 
 TIME_ZONE = "Asia/Kolkata"
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
@@ -140,7 +141,7 @@ sentry_logging = LoggingIntegration(
 )
 sentry_sdk.init(
     dsn=SENTRY_DSN,
-    integrations=[sentry_logging, DjangoIntegration()],
+    integrations=[sentry_logging, DjangoIntegration(), RedisIntegration()],
     environment=env("SENTRY_ENV"),
     release=env("SENTRY_RELEASE"),
     traces_sample_rate=float(env("TRACE_SAMPLE_RATE")),
@@ -170,3 +171,28 @@ else:
             "HOST": env("DB_HOST"),
         }
     }
+
+# HUEY
+HUEY = {
+    "name": "HisabKitab",
+    "url": env("REDIS_URL"),
+    "immediate": DEBUG,
+    "utc": False,
+    "consumer": {
+        "workers": 2,
+        "worker_type": "thread",
+    },
+}
+
+# Welcome Email Configuration
+WELCOME_EMAIL_SUBJECT = "New account created | Hisab Kitab"
+WELCOME_EMAIL_BODY = """You've successfully created an account on Hisab Kitab. Thank you for
+choosing us. We hope you have a great experience with us. If you have any queries,
+please create an issue on our GitHub repository at https://github.com/101Loop/HisabKitab-BE.
+We will try to resolve it as soon as possible. Thank you!
+
+This app is a product of Vitartha, a StartUp focusing on Financially aware India.
+Vitartha will also like to thank M/s Civil Machines Technologies Private Limited for the technical
+production & development of this app.
+Thank You!
+"""
