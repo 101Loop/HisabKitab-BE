@@ -44,8 +44,8 @@ class TestRegisterAPIView(APITestCase):
         super().setUpTestData()
         cls.url = reverse("users:Register")
 
-    @mock.patch("users.views.send_message")
-    def test_register(self, mock_send_message: MagicMock):
+    @mock.patch("users.views.send_welcome_email_async")
+    def test_register(self, mock_send_welcome_email_async: MagicMock):
         data = {
             "username": "test",
             "password": "test",
@@ -60,4 +60,4 @@ class TestRegisterAPIView(APITestCase):
         self.assertEqual(data["email"], "test@example.com")
         self.assertEqual(data["mobile"], "1234567890")
         self.assertEqual(data["name"], "test")
-        mock_send_message.assert_called()
+        mock_send_welcome_email_async.assert_called()
