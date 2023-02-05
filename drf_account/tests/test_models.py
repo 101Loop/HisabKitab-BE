@@ -1,6 +1,11 @@
 from django.test import TestCase
 
-from drf_account.factories import BankMasterFactory, CreditCardFactory, BankAccountFactory, DebitCardFactory
+from drf_account.factories import (
+    BankAccountFactory,
+    BankMasterFactory,
+    CreditCardFactory,
+    DebitCardFactory,
+)
 
 
 class TestBankMaster(TestCase):
@@ -8,14 +13,18 @@ class TestBankMaster(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.bank_master = BankMasterFactory(
-            name="Axis Bank", aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]'
+            name="Axis Bank",
+            aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]',
         )
 
     def test_str(self):
         self.assertEqual(str(self.bank_master), "Axis Bank")
 
     def test_bank_aliases(self):
-        self.assertEqual(self.bank_master.bank_aliases, [{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"]}])
+        self.assertEqual(
+            self.bank_master.bank_aliases,
+            [{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"]}],
+        )
 
 
 class TestCreditCard(TestCase):
@@ -23,7 +32,8 @@ class TestCreditCard(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.bank_master = BankMasterFactory(
-            name="Axis Bank", aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]'
+            name="Axis Bank",
+            aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]',
         )
         cls.account = BankAccountFactory(bank=cls.bank_master)
         cls.credit_card = CreditCardFactory(
@@ -48,7 +58,8 @@ class TestDebitCard(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.bank_master = BankMasterFactory(
-            name="Axis Bank", aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]'
+            name="Axis Bank",
+            aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]',
         )
         cls.account = BankAccountFactory(bank=cls.bank_master)
         cls.debit_card = DebitCardFactory(

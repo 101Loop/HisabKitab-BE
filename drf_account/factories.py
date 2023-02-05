@@ -3,7 +3,7 @@ import random
 import factory
 from faker import Faker
 
-from drf_account.models import BankMaster, BankAccount, Card, CreditCard, DebitCard
+from drf_account.models import BankAccount, BankMaster, Card, CreditCard, DebitCard
 from users.factories import UserFactory
 
 faker = Faker()
@@ -37,8 +37,12 @@ class CreditCardFactory(factory.django.DjangoModelFactory):
     description = factory.LazyAttribute(lambda o: faker.text())
     account = factory.SubFactory(BankAccountFactory)
     vendor = factory.LazyAttribute(lambda o: random.choices(["V", "M", "MC"]))
-    limit = factory.LazyAttribute(lambda o: faker.pyint(min_value=10000, max_value=50000))
-    statement_date = factory.LazyAttribute(lambda o: faker.pyint(min_value=1, max_value=31))
+    limit = factory.LazyAttribute(
+        lambda o: faker.pyint(min_value=10000, max_value=50000)
+    )
+    statement_date = factory.LazyAttribute(
+        lambda o: faker.pyint(min_value=1, max_value=31)
+    )
 
     class Meta:
         model = CreditCard

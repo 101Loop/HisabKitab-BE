@@ -1,7 +1,11 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
-from drf_account.factories import BankMasterFactory, BankAccountFactory, DebitCardFactory
+from drf_account.factories import (
+    BankAccountFactory,
+    BankMasterFactory,
+    DebitCardFactory,
+)
 from drf_account.models import BankMaster, DebitCard
 from users.factories import UserFactory
 
@@ -32,7 +36,12 @@ class TestAddBankAccountView(APITestCase):
         self.client.force_authenticate(self.user)
         response = self.client.post(
             self.url,
-            {"nickname": "axis", "bank": "Axis Bank", "description": "This is a bank", "accnumber": 88223344},
+            {
+                "nickname": "axis",
+                "bank": "Axis Bank",
+                "description": "This is a bank",
+                "accnumber": 88223344,
+            },
             format="json",
         )
         self.assertEqual(response.status_code, 201)
@@ -94,7 +103,9 @@ class TestAddDebitCardView(APITestCase):
 
     def test_api_raises_400_if_both_bank_and_account_are_not_passed(self):
         self.client.force_authenticate(self.user)
-        response = self.client.post(self.url, {"nickname": "axis", "vendor": "MC"}, format="json")
+        response = self.client.post(
+            self.url, {"nickname": "axis", "vendor": "MC"}, format="json"
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_api_creates_bank_and_debit_card(self):
@@ -159,8 +170,12 @@ class TestShowDebitCardView(APITestCase):
         cls.bank_master_2 = BankMasterFactory(name="Axis Bank")
         cls.bank_account_1 = BankAccountFactory(bank=cls.bank_master_1)
         cls.bank_account_2 = BankAccountFactory(bank=cls.bank_master_2)
-        cls.debit_card_1 = DebitCardFactory(account=cls.bank_account_1, bank=cls.bank_master_1, created_by=cls.user)
-        cls.debit_card_2 = DebitCardFactory(account=cls.bank_account_2, bank=cls.bank_master_2, created_by=cls.user)
+        cls.debit_card_1 = DebitCardFactory(
+            account=cls.bank_account_1, bank=cls.bank_master_1, created_by=cls.user
+        )
+        cls.debit_card_2 = DebitCardFactory(
+            account=cls.bank_account_2, bank=cls.bank_master_2, created_by=cls.user
+        )
 
     def test_api_raises_403_if_not_authenticated(self):
         response = self.client.get(self.url, {})

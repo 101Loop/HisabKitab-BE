@@ -9,10 +9,12 @@ class TestGetBankByName(TestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.axis_bank = BankMasterFactory(
-            name="Axis Bank", aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]'
+            name="Axis Bank",
+            aliases='[{"name": "Axis Bank", "aliases": ["Axis", "Axis Bank"] }]',
         )
         cls.central_bank = BankMasterFactory(
-            name="Central Bank", aliases='[{"name": "Central Bank", "aliases": ["Central", "Central Bank"] }]'
+            name="Central Bank",
+            aliases='[{"name": "Central Bank", "aliases": ["Central", "Central Bank"] }]',
         )
 
     def test_get_axis_bank(self):
