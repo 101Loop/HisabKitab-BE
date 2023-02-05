@@ -119,3 +119,12 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_THROTTLE_RATES": {"anon": "100/day", "user": "1000/day"},
 }
+
+WELCOME_EMAIL_BODY = "Welcome to HisabKitab"
+WELCOME_EMAIL_SUBJECT = "Welcome to HisabKitab"
+ALLOWED_OTP_CHARACTERS = "0123456789"
+REDIS_URL = "redis://localhost:6379/0"
+HUEY = {
+    'name': 'my-app',
+    'immediate': True,
+}
