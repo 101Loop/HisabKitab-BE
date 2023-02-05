@@ -1,0 +1,4 @@
+-r requirements.txt
+fakeredis[lua]==2.7.1
+factory_boy==3.2.1
+coverage==7.0.5

@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 
+from users.models import AuthTransaction, OTPValidation
+
 User = get_user_model()
 
 faker = Faker()
@@ -24,3 +26,19 @@ class UserFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda o: faker.name())
     mobile = factory.LazyFunction(generate_random_mobile)
     is_active = True
+
+
+class AuthTransactionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AuthTransaction
+
+    user = factory.SubFactory(UserFactory)
+    ip_address = factory.LazyFunction(lambda: faker.ipv4())
+
+
+class OTPValidationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = OTPValidation
+
+    otp = factory.LazyFunction(lambda: faker.random_number(digits=6, fix_len=True))
+    type = "email"
