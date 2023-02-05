@@ -25,7 +25,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: Generate Report
         run: |
           coverage run --branch manage.py test --settings=HisabKitab.test_settings
