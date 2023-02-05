@@ -28,7 +28,7 @@ def get_bank_by_name(name: str) -> Optional[BankMaster]:
     try:
         bank_master: BankMaster = BankMaster.objects.get(name=name)
     except BankMaster.DoesNotExist:
-        regex = '"' + name + '"'
+        regex = f"{name}"
         bank_master: QuerySet = BankMaster.objects.filter(aliases__iregex=regex).first()
         return bank_master or None
 

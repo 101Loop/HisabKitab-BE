@@ -2,6 +2,7 @@ from django_filters.rest_framework.backends import DjangoFilterBackend
 from drfaddons.filters import IsOwnerFilterBackend
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
 
+from drf_account.mixins import CreateBankAccountMixin
 from drf_account.models import BankAccount, BankMaster, CreditCard, DebitCard
 from drf_account.serializers import (
     AddBankAccountSerializer,
@@ -18,7 +19,7 @@ from drf_account.serializers import (
 from drf_account.utils import get_bank_by_name
 
 
-class AddBankAccountView(CreateAPIView):
+class AddBankAccountView(CreateAPIView, CreateBankAccountMixin):
     """
     This view will allow the user to add a new bank account.
     """
@@ -26,13 +27,8 @@ class AddBankAccountView(CreateAPIView):
     serializer_class = AddBankAccountSerializer
 
     def perform_create(self, serializer):
-        bank = serializer.validated_data["bank"]
-        bank_master = get_bank_by_name(bank)
-        if not bank_master:
-            bank_master = BankMaster()
-            bank_master.name = bank
-            bank_master.created_by = self.request.user
-            bank_master.save()
+        bank_name: str = serializer.validated_data["bank"]
+        bank_master = self.get_or_create_bank(bank_name)
         serializer.validated_data["bank"] = bank_master
         serializer.save(created_by=self.request.user)
 
@@ -46,7 +42,7 @@ class ShowBankAccountView(ListAPIView):
     queryset = BankAccount.objects.all().order_by("-create_date")
 
 
-class AddDebitCardView(CreateAPIView):
+class AddDebitCardView(CreateAPIView, CreateBankAccountMixin):
     """
     This view will allow the user to add a new debit card.
     """
@@ -54,22 +50,12 @@ class AddDebitCardView(CreateAPIView):
     serializer_class = AddDebitCardSerializer
 
     def perform_create(self, serializer):
-        if (
-            "account" in serializer.validated_data.keys()
-            and serializer.validated_data["account"]
-        ):
-            account_obj = BankAccount.objects.get(
-                pk=serializer.validated_data["account"]
-            )
+        if "account" in serializer.validated_data:
+            account_obj: BankAccount = serializer.validated_data["account"]
             serializer.validated_data["bank"] = account_obj.bank
         else:
-            bank = serializer.validated_data["bank"]
-            bank_master = get_bank_by_name(bank)
-            if not bank_master:
-                bank_master = BankMaster()
-                bank_master.name = bank
-                bank_master.created_by = self.request.user
-                bank_master.save()
+            bank_name: str = serializer.validated_data["bank"]
+            bank_master = self.get_or_create_bank(bank_name)
             serializer.validated_data["bank"] = bank_master
         serializer.save(created_by=self.request.user)
 
