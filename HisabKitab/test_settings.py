@@ -125,6 +125,6 @@ WELCOME_EMAIL_SUBJECT = "Welcome to HisabKitab"
 ALLOWED_OTP_CHARACTERS = "0123456789"
 REDIS_URL = "redis://localhost:6379/0"
 HUEY = {
-    'name': 'my-app',
-    'immediate': True,
+    "name": "my-app",
+    "immediate": True,
 }
