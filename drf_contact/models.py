@@ -19,7 +19,11 @@ class ContactDetail(CreateUpdateModel):
 
     @property
     def user(self) -> User:
-        if not (user := User.objects.filter(Q(email=self.email) | Q(mobile=self.mobile)).first()):
+        if not (
+            user := User.objects.filter(
+                Q(email=self.email) | Q(mobile=self.mobile)
+            ).first()
+        ):
             raise serializers.ValidationError(
                 "User with provided email or mobile does not exist"
             )

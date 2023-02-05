@@ -22,7 +22,9 @@ class TestAddContacts(APITestCase):
 
     def test_api_raises_400_if_no_name_is_passed(self):
         self.client.force_authenticate(self.user)
-        response = self.client.post(self.url, {"email": "temp@example.com"}, format="json")
+        response = self.client.post(
+            self.url, {"email": "temp@example.com"}, format="json"
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_api_creates_contact(self):
