@@ -56,8 +56,15 @@ class AddDebitCardSerializer(serializers.ModelSerializer):
     """
 
     bank = serializers.CharField(
-        max_length=254, required=True, allow_null=False, allow_blank=False
+        max_length=254, required=False, allow_null=True, allow_blank=True
     )
+
+    def validate(self, attrs):
+        if "account" not in attrs and "bank" not in attrs:
+            raise serializers.ValidationError(
+                "Either account or bank is required to create a debit card."
+            )
+        return attrs
 
     class Meta:
         model = DebitCard
