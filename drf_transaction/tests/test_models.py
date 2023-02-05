@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from drf_transaction.factories import TransactionModeFactory, TransactionDetailFactory
+from drf_transaction.factories import TransactionDetailFactory, TransactionModeFactory
 
 
 class TestTransactionMode(TestCase):

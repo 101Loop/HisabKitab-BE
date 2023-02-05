@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from django.urls import reverse
 from rest_framework import status
@@ -54,7 +54,10 @@ class TestShowTransactionAmount(APITestCase):
         self.assertEqual(res_json["results"][1]["id"], self.transaction_2.id)
         self.assertEqual(res_json["results"][2]["id"], self.transaction_1.id)
 
-    @patch("drf_transaction.views.ShowTransactionAmount.pagination_class", return_value=None)
+    @patch(
+        "drf_transaction.views.ShowTransactionAmount.pagination_class",
+        return_value=None,
+    )
     def test_response_without_pagination(self, mock_paginator: MagicMock):
         """
         GIVEN: An authenticated user
