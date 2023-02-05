@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -51,6 +53,27 @@ class TestShowTransactionAmount(APITestCase):
         self.assertEqual(res_json["results"][0]["id"], self.transaction_3.id)
         self.assertEqual(res_json["results"][1]["id"], self.transaction_2.id)
         self.assertEqual(res_json["results"][2]["id"], self.transaction_1.id)
+
+    @patch(
+        "drf_transaction.views.ShowTransactionAmount.pagination_class",
+        return_value=None,
+    )
+    def test_response_without_pagination(self, mock_paginator: MagicMock):
+        """
+        GIVEN: An authenticated user
+        WHEN: Pagination is disabled
+        THEN: Response should not contain pagination
+        """
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        res_json = response.json()
+        self.assertTrue(isinstance(res_json, list))
+        self.assertEqual(res_json[0]["id"], self.transaction_3.id)
+        self.assertEqual(res_json[1]["id"], self.transaction_2.id)
+        self.assertEqual(res_json[2]["id"], self.transaction_1.id)
+
+        mock_paginator.assert_called_once()
 
     def test_api_query_count(self):
         """
