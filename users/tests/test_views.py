@@ -46,11 +46,15 @@ class TestRegisterAPIView(APITestCase):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.url = reverse("users:register")
-        cls.user = UserFactory(username="random", email="random@email.com", mobile="8800880088")
+        cls.user = UserFactory(
+            username="random", email="random@email.com", mobile="8800880088"
+        )
 
     @mock.patch("users.views.send_welcome_email_async")
     @mock.patch("users.views.get_redis_conn", return_value=fakeredis.FakeStrictRedis())
-    def test_register(self, mock_redis: MagicMock, mock_send_welcome_email_async: MagicMock):
+    def test_register(
+        self, mock_redis: MagicMock, mock_send_welcome_email_async: MagicMock
+    ):
         data = {
             "username": "test",
             "password": "test",
@@ -107,9 +111,14 @@ class TestLoginOTPAPIView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         json = response.json()
         self.assertFalse(json["data"]["success"])
-        self.assertEqual(json["data"]["message"], "No user exists with provided details!")
+        self.assertEqual(
+            json["data"]["message"], "No user exists with provided details!"
+        )
 
-    @patch("users.utils.send_message", return_value={"success": True, "message": "Message sent successfully!"})
+    @patch(
+        "users.utils.send_message",
+        return_value={"success": True, "message": "Message sent successfully!"},
+    )
     def test_user_exists_with_null_otp(self, mock_send_message: MagicMock):
         data = {"value": self.email}
 
@@ -175,14 +184,19 @@ class TestUpdateProfileViewAPIView(APITestCase):
         self.client.force_authenticate(self.user)
         response = self.client.put(self.url, data={}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json()["data"]["non_field_errors"], ['Please provide at least one field to update.'])
+        self.assertEqual(
+            response.json()["data"]["non_field_errors"],
+            ["Please provide at least one field to update."],
+        )
 
     def test_api_raises_400_if_user_exists_for_given_data(self):
         self.client.force_authenticate(self.user)
         data = {"email": "random1@email.com"}
         response = self.client.put(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json(), ['Given mobile number or email is already registered.'])
+        self.assertEqual(
+            response.json(), ["Given mobile number or email is already registered."]
+        )
 
     def test_api_updates_profile_attributes(self):
         self.client.force_authenticate(self.user)
@@ -199,7 +213,6 @@ class TestUserProfileViewAPIView(APITestCase):
         super().setUpTestData()
         cls.url = reverse("users:user_profile")
         cls.user = UserFactory()
-
 
     def test_api_raises_403_for_unauthenticated_user(self):
         response = self.client.get(self.url, format="json")

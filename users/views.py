@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from drfaddons.utils import validate_email, JsonResponse
+from drfaddons.utils import JsonResponse, validate_email
 from drfaddons.views import ValidateAndPerformView
 from redis.client import Redis
 from rest_framework.exceptions import ValidationError
@@ -15,15 +15,15 @@ from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from core.utils import get_redis_conn
 from users.constants import OTPValidationType
 from users.serializers import (
+    CheckUniqueSerializer,
     ForgotPasswordSerializer,
+    OTPVerify,
+    UpdateProfileSerializer,
     UserProfileSerializer,
     UserRegisterSerializer,
-    OTPVerify,
-    CheckUniqueSerializer,
-    UpdateProfileSerializer,
 )
 from users.tasks import send_welcome_email_async
-from users.utils import login_user, check_unique, generate_otp, send_otp, validate_otp
+from users.utils import check_unique, generate_otp, login_user, send_otp, validate_otp
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,9 @@ class Login(ValidateAndPerformView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid(raise_exception=False):
-            return JsonResponse(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return JsonResponse(
+                serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
 
         user = serializer.validated_data["user"]
         data, status_code = login_user(user, request)
@@ -122,10 +124,18 @@ class LoginOTP(ValidateAndPerformView):
             return data, status_code
 
         if otp is None:
-            prop = OTPValidationType.EMAIL if validate_email(value) else OTPValidationType.MOBILE
+            prop = (
+                OTPValidationType.EMAIL
+                if validate_email(value)
+                else OTPValidationType.MOBILE
+            )
             otp_obj = generate_otp(prop, value)
             data = send_otp(prop, value, otp_obj, user.email)
-            status_code = status.HTTP_201_CREATED if data["success"] else status.HTTP_400_BAD_REQUEST
+            status_code = (
+                status.HTTP_201_CREATED
+                if data["success"]
+                else status.HTTP_400_BAD_REQUEST
+            )
 
             return data, status_code
 
@@ -168,9 +178,13 @@ class UpdateProfileView(UpdateAPIView):
         try:
             self.perform_update(serializer)
             request.user.save()
-            return JsonResponse(serializer.validated_data, status=status.HTTP_202_ACCEPTED)
+            return JsonResponse(
+                serializer.validated_data, status=status.HTTP_202_ACCEPTED
+            )
         except IntegrityError as e:
-            raise ValidationError("Given mobile number or email is already registered.") from e
+            raise ValidationError(
+                "Given mobile number or email is already registered."
+            ) from e
 
 
 class UserProfileView(ListAPIView):

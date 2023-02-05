@@ -1,14 +1,20 @@
 """Tests for drf_user/utils.py module"""
 import datetime
-from unittest.mock import patch, MagicMock, ANY
+from unittest.mock import ANY, MagicMock, patch
 
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
 
-from users.factories import UserFactory, OTPValidationFactory
+from users.factories import OTPValidationFactory, UserFactory
 from users.models import OTPValidation
-from users.utils import check_unique, check_validation, generate_otp, validate_otp, send_otp
+from users.utils import (
+    check_unique,
+    check_validation,
+    generate_otp,
+    send_otp,
+    validate_otp,
+)
 
 
 class TestCheckUnique(TestCase):
@@ -34,7 +40,9 @@ class TestCheckValidation(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
-        cls.validated_otp_validation = OTPValidationFactory(destination="user@email.com", is_validated=True)
+        cls.validated_otp_validation = OTPValidationFactory(
+            destination="user@email.com", is_validated=True
+        )
 
     def test_check_validated_object(self):
         """Check if the value is validated"""
@@ -51,7 +59,9 @@ class TestGenerateOTP(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.opt_validation = OTPValidationFactory(destination="test@example.com", otp=1234567, is_validated=False)
+        cls.opt_validation = OTPValidationFactory(
+            destination="test@example.com", otp=1234567, is_validated=False
+        )
 
     def test_generate_otp(self):
         """Check generate_otp successfully generates OTPValidation object or not"""
@@ -82,7 +92,9 @@ class TestGenerateOTP(TestCase):
         self.assertEqual(otp_validation2.otp, otp_validation1.otp)
 
     @patch("users.utils.get_random_string", return_value="1234567")
-    def test_generate_otp_generates_new_otp_if_one_already_exists(self, mock_get_random_string: MagicMock):
+    def test_generate_otp_generates_new_otp_if_one_already_exists(
+        self, mock_get_random_string: MagicMock
+    ):
         """
         Check generate_otp generates a new otp if the one already exists
         """
@@ -97,7 +109,9 @@ class TestValidateOTP(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
-        cls.otp_validation = OTPValidationFactory(destination="user@email.com", otp=12345)
+        cls.otp_validation = OTPValidationFactory(
+            destination="user@email.com", otp=12345
+        )
 
     def test_validate_otp(self):
         """Check if OTPValidation object is created or not"""
@@ -141,7 +155,9 @@ class TestSendOTP(TestCase):
         cls.new_email = "new_user@email.com"
         reactive_at = timezone.now() + datetime.timedelta(minutes=5)
         old_reactive_at = timezone.now() - datetime.timedelta(minutes=5)
-        cls.otp_validation = OTPValidationFactory(destination=cls.email, otp=1234567, reactive_at=reactive_at)
+        cls.otp_validation = OTPValidationFactory(
+            destination=cls.email, otp=1234567, reactive_at=reactive_at
+        )
         cls.reactivated_otp_validation = OTPValidationFactory(
             destination=cls.new_email, otp=1234568, reactive_at=old_reactive_at
         )
@@ -155,15 +171,25 @@ class TestSendOTP(TestCase):
             f"OTP sending not allowed until: {self.otp_validation.reactive_at.strftime('%d-%h-%Y %H:%M:%S')}",
         )
 
-    @patch("users.utils.send_message", return_value={"success": True, "message": "Message sent successfully!"})
+    @patch(
+        "users.utils.send_message",
+        return_value={"success": True, "message": "Message sent successfully!"},
+    )
     def test_send_otp_send_email(self, mock_send_message: MagicMock):
-        data = send_otp("email", self.new_email, self.reactivated_otp_validation, self.new_email)
+        data = send_otp(
+            "email", self.new_email, self.reactivated_otp_validation, self.new_email
+        )
 
         self.assertTrue(data["success"])
         self.assertEqual(data["message"], "Message sent successfully!")
         self.reactivated_otp_validation.refresh_from_db()
-        self.assertGreaterEqual(self.reactivated_otp_validation.reactive_at, timezone.now())
+        self.assertGreaterEqual(
+            self.reactivated_otp_validation.reactive_at, timezone.now()
+        )
 
         mock_send_message.assert_called_once_with(
-            message=ANY, subject="OTP for Verification", recip_email=[self.new_email], recip=[self.new_email]
+            message=ANY,
+            subject="OTP for Verification",
+            recip_email=[self.new_email],
+            recip=[self.new_email],
         )

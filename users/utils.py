@@ -5,11 +5,11 @@ import string
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.crypto import get_random_string
-from drfaddons.utils import send_message, get_client_ip
+from drfaddons.utils import get_client_ip, send_message
 from rest_framework import status
 from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
 
-from users.models import OTPValidation, AuthTransaction
+from users.models import AuthTransaction, OTPValidation
 
 User = get_user_model()
 
@@ -24,7 +24,7 @@ def random_number_token(length=6):
     # Copied from https://github.com/django-otp/django-otp/blob/master/src/django_otp/util.py
     """
     rand = random.SystemRandom()
-    return ''.join(rand.choices(string.digits, k=length))
+    return "".join(rand.choices(string.digits, k=length))
 
 
 def check_unique(prop, value):
@@ -86,9 +86,15 @@ def generate_otp(prop, value) -> OTPValidation:
         return otp_object
 
     # Create a random number
-    random_number = get_random_string(length=7, allowed_chars=settings.ALLOWED_OTP_CHARACTERS)
+    random_number = get_random_string(
+        length=7, allowed_chars=settings.ALLOWED_OTP_CHARACTERS
+    )
     # Checks if random number is unique among non-validated OTPs and creates new until it is unique.
-    while OTPValidation.objects.filter(otp__exact=random_number).filter(is_validated=False).exists():
+    while (
+        OTPValidation.objects.filter(otp__exact=random_number)
+        .filter(is_validated=False)
+        .exists()
+    ):
         # using a different random number generator here because it's quite difficult to write
         # tests for this otherwise because it'll keep generating the same number over and over
         random_number = random_number_token(length=7)
@@ -164,7 +170,9 @@ def validate_otp(value, otp):
             data["OTP"] = "Attempt exceeded! OTP has been reset!"
         else:
             otp_object.save()
-            data["OTP"] = f"OTP Validation failed! {otp_object.validate_attempt} attempts left!"
+            data[
+                "OTP"
+            ] = f"OTP Validation failed! {otp_object.validate_attempt} attempts left!"
             status_code = status.HTTP_401_UNAUTHORIZED
     except OTPValidation.DoesNotExist:
         # If OTP object doesn't exist set proper message and status_code
@@ -197,13 +205,19 @@ def send_otp(prop: str, value: str, otpobj: OTPValidation, recip: str) -> dict:
     rdata = {"success": False, "message": None}
 
     if otpobj.reactive_at > datetime.datetime.now():
-        rdata["message"] = f"OTP sending not allowed until: {otpobj.reactive_at.strftime('%d-%h-%Y %H:%M:%S')}"
+        rdata[
+            "message"
+        ] = f"OTP sending not allowed until: {otpobj.reactive_at.strftime('%d-%h-%Y %H:%M:%S')}"
         return rdata
 
-    message = f"OTP for verifying {prop}: {value} is {otp}. Don't share this with anyone!"
+    message = (
+        f"OTP for verifying {prop}: {value} is {otp}. Don't share this with anyone!"
+    )
 
     subject = "OTP for Verification"
-    rdata = send_message(message=message, subject=subject, recip_email=[recip], recip=[recip])
+    rdata = send_message(
+        message=message, subject=subject, recip_email=[recip], recip=[recip]
+    )
 
     if rdata["success"]:
         otpobj.reactive_at = datetime.datetime.now() + datetime.timedelta(minutes=3)
@@ -249,6 +263,8 @@ def check_validation(value: str) -> bool:
 
     """
     try:
-        return OTPValidation.objects.values_list("is_validated", flat=True).get(destination=value)
+        return OTPValidation.objects.values_list("is_validated", flat=True).get(
+            destination=value
+        )
     except OTPValidation.DoesNotExist:
         return False

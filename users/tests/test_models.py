@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from users.factories import UserFactory, AuthTransactionFactory, OTPValidationFactory
+from users.factories import AuthTransactionFactory, OTPValidationFactory, UserFactory
 
 
 class TestUser(TestCase):

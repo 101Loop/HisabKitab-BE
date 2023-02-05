@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 User = get_user_model()
 
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     UserRegisterSerializer is a model serializer which includes the attributes that are required for registering a user.
@@ -160,8 +161,10 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
 
     def validate(self, attrs):
-        if not attrs.get('email') and not attrs.get('mobile') and not attrs.get('name'):
-            raise serializers.ValidationError("Please provide at least one field to update.")
+        if not attrs.get("email") and not attrs.get("mobile") and not attrs.get("name"):
+            raise serializers.ValidationError(
+                "Please provide at least one field to update."
+            )
         return attrs
 
     class Meta:
