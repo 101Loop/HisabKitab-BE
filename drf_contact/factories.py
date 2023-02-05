@@ -1,11 +1,8 @@
 import factory
-from django.contrib.auth import get_user_model
 from faker import Faker
 
 from drf_contact.models import ContactDetail
 from users.factories import UserFactory
-
-User = get_user_model()
 
 faker = Faker()
 

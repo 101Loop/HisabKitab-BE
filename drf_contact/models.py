@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import Q
 from django.utils.text import gettext_lazy as _
 from drfaddons.models import CreateUpdateModel
 from rest_framework import serializers
@@ -17,16 +18,17 @@ class ContactDetail(CreateUpdateModel):
     mobile = models.CharField(_("Mobile Number"), max_length=15, null=True)
 
     @property
-    def user(self):
-        if email_user := User.objects.filter(email=self.email).first():
-            return email_user
+    def user(self) -> User:
+        if not (
+            user := User.objects.filter(
+                Q(email=self.email) | Q(mobile=self.mobile)
+            ).first()
+        ):
+            raise serializers.ValidationError(
+                "User with provided email or mobile does not exist"
+            )
 
-        if mobile_user := User.objects.filter(mobile=self.mobile).first():
-            return mobile_user
-
-        raise serializers.ValidationError(
-            "User with provided email or mobile does not exist"
-        )
+        return user
 
     def __str__(self):
         """
