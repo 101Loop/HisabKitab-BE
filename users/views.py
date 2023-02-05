@@ -1,271 +1,33 @@
-import datetime
+import logging
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+from drfaddons.utils import JsonResponse, validate_email
 from drfaddons.views import ValidateAndPerformView
+from redis.client import Redis
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, UpdateAPIView
 from rest_framework.mixins import status
+from rest_framework_jwt.serializers import JSONWebTokenSerializer
 
-from . import serializers
-from .models import OTPValidation
-from .serializers import UserProfileSerializer
-from .tasks import send_welcome_email_async
+from core.utils import get_redis_conn
+from users.constants import OTPValidationType
+from users.serializers import (
+    CheckUniqueSerializer,
+    ForgotPasswordSerializer,
+    OTPVerify,
+    UpdateProfileSerializer,
+    UserProfileSerializer,
+    UserRegisterSerializer,
+)
+from users.tasks import send_welcome_email_async
+from users.utils import check_unique, generate_otp, login_user, send_otp, validate_otp
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
-
-
-def check_unique(prop, value):
-    """
-    This function checks if the value provided is present in Database or can be created in DBMS as unique data.
-    Parameters
-    ----------
-    prop: str
-        The model property to check for. Can be::
-            email
-            mobile
-            username
-    value: str
-        The value of the property specified
-
-    Returns
-    -------
-    bool
-        True if the data sent doesn't exist, False otherwise.
-    Examples
-    --------
-    To check if test@testing.com email address is already present in Database
-    >>> print(check_unique('email', 'test@testing.com'))
-    True
-    """
-    user = User.objects.extra(where=[f"{prop} = '{value}'"])
-    return user.count() == 0
-
-
-def generate_otp(prop, value):
-    """
-    This function generates an OTP and saves it into Model. It also sets various counters, such as send_counter,
-    is_validated, validate_attempt.
-    Parameters
-    ----------
-    prop: str
-        This specifies the type for which OTP is being created. Can be::
-            email
-            mobile
-    value: str
-        This specifies the value for which OTP is being created.
-
-    Returns
-    -------
-    otp_object: OTPValidation
-        This is the instance of OTP that is created.
-    Examples
-    --------
-    To create an OTP for an Email test@testing.com
-    >>> print(generate_otp('email', 'test@testing.com'))
-    OTPValidation object
-
-    >>> print(generate_otp('email', 'test@testing.com').otp)
-    5039164
-    """
-    # Create a random number
-    random_number = User.objects.make_random_password(
-        length=7, allowed_chars="1234567890"
-    )
-    # Checks if random number is unique among non-validated OTPs and creates new until it is unique.
-    while OTPValidation.objects.filter(otp__exact=random_number).filter(
-        is_validated=False
-    ):
-        random_number = User.objects.make_random_password(
-            length=10, allowed_chars="123456789"
-        )
-
-    # Get or Create new instance of Model with value of provided value and set proper counter.
-    otp_object, created = OTPValidation.objects.get_or_create(destination=value)
-    if not created and otp_object.reactive_at > datetime.datetime.now():
-        return otp_object
-
-    otp_object.otp = random_number
-    otp_object.type = prop
-    # Set is_validated to False
-    otp_object.is_validated = False
-    # Set attempt counter to 3, user has to enter correct OTP in 3 chances.
-    otp_object.validate_attempt = 3
-    otp_object.reactive_at = datetime.datetime.now() - datetime.timedelta(minutes=1)
-    otp_object.save()
-    return otp_object
-
-
-def validate_otp(value, otp):
-    """
-    This function is used to validate the OTP for a particular value.
-    It also reduces the attempt count by 1 and resets OTP.
-    Parameters
-    ----------
-    value: str
-        This is the unique entry for which OTP has to be validated.
-    otp: int
-        This is the OTP that will be validated against one in Database.
-
-    Returns
-    -------
-    tuple
-        Returns a tuple containing::
-                data: dict
-                    This is a dictionary containing::
-                        'success': bool
-                            This will be True if OTP is validated, else False
-                        'OTP': str
-                            This will contain a proper message about the OTP Validation
-                status: int
-                    This will be a HTTP Status Code with resepect to the type of success or error occurred.
-    Examples
-    --------
-    To validate an OTP against test@testing.com with wrong OTP
-    >>> print(validate_otp('test@testing.com', 6518631))
-    ({'OTP': 'OTP Validation failed! 2 attempts left!', 'success': False}, 401)
-
-    To validate an OTP against random@email.com with value that doesn't exist
-    >>>print(validate_otp('random@email.com', 6518631))
-    ({'OTP': 'Provided value to verify not found!', 'success': False}, 404)
-
-    To validate a correct OTP with value test@testing.com
-    >>>print(validate_otp('test@testing.com', 5039164))
-    ({'OTP': 'OTP Validated successfully!', 'success': True}, 202)
-
-    To validate incorrect OTP more than 3 times or re-validate already validated value with incorrect OTP
-    >>>print(validate_otp('test@testing.com', 6518631))
-    ({'OTP': 'Attempt exceeded! OTP has been reset!', 'success': False}, 401)
-    """
-    # Initialize data dictionary that will be returned
-    data = {"success": False}
-    try:
-        # Try to get OTP Object from Model and initialize data dictionary
-        otp_object = OTPValidation.objects.get(destination=value)
-        # Decrement validate_attempt
-        otp_object.validate_attempt -= 1
-        if str(otp_object.otp) == str(otp):
-            otp_object.is_validated = True
-            otp_object.save()
-            data["OTP"] = "OTP Validated successfully!"
-            data["success"] = True
-            status_code = status.HTTP_202_ACCEPTED
-        elif otp_object.validate_attempt <= 0:
-            generate_otp(otp_object.type, value)
-            status_code = status.HTTP_401_UNAUTHORIZED
-            data["OTP"] = "Attempt exceeded! OTP has been reset!"
-        else:
-            otp_object.save()
-            data["OTP"] = (
-                "OTP Validation failed! "
-                + str(otp_object.validate_attempt)
-                + " attempts left!"
-            )
-            status_code = status.HTTP_401_UNAUTHORIZED
-    except OTPValidation.DoesNotExist:
-        # If OTP object doesn't exist set proper message and status_code
-        data["OTP"] = "Provided value to verify not found!"
-        status_code = status.HTTP_404_NOT_FOUND
-
-    return data, status_code
-
-
-def send_otp(prop, value, otpobj, recip):
-    """
-    This function sends OTP to specified value.
-    Parameters
-    ----------
-    prop: str
-        This is the type of value. It can be "email" or "mobile"
-    value: str
-        This is the value at which and for which OTP is to be sent.
-    otpobj: OTPValidation
-        This is the OTP or One Time Passcode that is to be sent to user.
-    recip: str
-        This is the recipient to whom EMail is being sent. This will be deprecated once SMS feature is brought in.
-
-    Returns
-    -------
-
-    """
-    from drfaddons.utils import send_message
-
-    otp = otpobj.otp
-
-    rdata = {"success": False, "message": None}
-
-    if otpobj.reactive_at > datetime.datetime.now():
-        rdata[
-            "message"
-        ] = "OTP sending not allowed until: " + otpobj.reactive_at.strftime(
-            "%d-%h-%Y %H:%M:%S"
-        )
-        return rdata
-
-    message = (
-        f"OTP for verifying {prop}: {value} is {otp}. Don't share this with anyone!"
-    )
-
-    subject = "OTP for Verification"
-    rdata = send_message(
-        message=message, subject=subject, recip_email=[recip], recip=[recip]
-    )
-
-    if rdata["success"]:
-        otpobj.reactive_at = datetime.datetime.now() + datetime.timedelta(minutes=3)
-        otpobj.save()
-
-    return rdata
-
-
-def login_user(user: User, request) -> (dict, int):
-
-    from drfaddons.utils import get_client_ip
-    from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
-
-    from .models import AuthTransaction
-
-    token = jwt_encode_handler(jwt_payload_handler(user))
-    user.last_login = datetime.datetime.now()
-    user.save()
-    AuthTransaction(
-        user=user,
-        ip_address=get_client_ip(request),
-        token=token,
-        session=user.get_session_auth_hash(),
-    ).save()
-
-    data = {"session": user.get_session_auth_hash(), "token": token}
-    status_code = status.HTTP_200_OK
-    return data, status_code
-
-
-def check_validation(value):
-    """
-    This functions check if given value is already validated via OTP or not.
-    Bypassed for FlexyManagers
-    Parameters
-    ----------
-    value: str
-        This is the value for which OTP validation is to be checked.
-
-    Returns
-    -------
-    bool
-        True if value is validated, False otherwise.
-    Examples
-    --------
-    To check if 'test@testing.com' has been validated!
-    >>> print(check_validation('test@testing.com'))
-    True
-
-    """
-    try:
-        otp_object = OTPValidation.objects.get(destination=value)
-        return bool(otp_object.is_validated)
-    except OTPValidation.DoesNotExist:
-        return False
 
 
 class Register(ValidateAndPerformView):
@@ -273,13 +35,14 @@ class Register(ValidateAndPerformView):
     This Registers a new User to the system.
     """
 
-    serializer_class = serializers.UserRegisterSerializer
+    serializer_class = UserRegisterSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
+        redis: Redis = get_redis_conn()
         email = serialized_data.initial_data["email"]
         mobile = serialized_data.initial_data["mobile"]
-        try:
-            is_new = True
+        lock_str = f"register_lock:{email}:{mobile}"
+        with redis.lock(lock_str, timeout=5, blocking_timeout=0):
             user = User.objects.create_user(
                 username=serialized_data.initial_data["username"],
                 email=email,
@@ -288,9 +51,6 @@ class Register(ValidateAndPerformView):
                 mobile=mobile,
                 is_active=True,
             )
-        except IntegrityError:
-            is_new = False
-            user = User.objects.get(Q(email=email) | Q(mobile=mobile))
 
         data = {
             "name": user.get_full_name(),
@@ -300,8 +60,7 @@ class Register(ValidateAndPerformView):
             "mobile": user.mobile,
         }
         status_code = status.HTTP_201_CREATED
-        if is_new:
-            send_welcome_email_async(user.email)
+        send_welcome_email_async(user.email)
 
         return data, status_code
 
@@ -312,99 +71,19 @@ class Login(ValidateAndPerformView):
     In 'username' user can provide either username or mobile or email address.
     """
 
-    from django.views.decorators.csrf import csrf_exempt
-    from rest_framework_jwt.serializers import JSONWebTokenSerializer
-
     serializer_class = JSONWebTokenSerializer
-
-    def validated(self, serialized_data, **kwargs):
-        from django.contrib.auth import authenticate
-
-        user = authenticate(
-            username=serialized_data.initial_data["username"],
-            password=serialized_data.initial_data["password"],
-        )
-
-        if user is not None:
-            data, status_code = login_user(user, kwargs.get("request"))
-
-        else:
-            data = {"message": "User not found/Password combination wrong"}
-            status_code = status.HTTP_401_UNAUTHORIZED
-
-        return data, status_code
 
     @csrf_exempt
     def post(self, request):
-        from drfaddons.utils import JsonResponse
-
-        serialize = self.serializer_class(data=request.data)
-        if serialize.is_valid():
-            data, status_code = self.validated(
-                serialized_data=serialize, request=request
-            )
-            return JsonResponse(data, status=status_code)
-        else:
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid(raise_exception=False):
             return JsonResponse(
-                serialize.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY
+                serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY
             )
 
-
-class SendOTP(ValidateAndPerformView):
-    """
-    This sends an OTP to a value. This process should be followed by VerifyOTP to validate an email or mobile.
-    'prop': Can be email or mobile
-    'value': A valid email address or mobile number
-    'email': Temporarily here. OTP will be sent here in case of mobile.
-    """
-
-    serializer_class = serializers.SendOTPSerializer
-
-    def validated(self, serialized_data, *args, **kwargs):
-        from drfaddons.utils import validate_email, validate_mobile
-
-        prop = serialized_data.initial_data["prop"]
-        value = serialized_data.initial_data["value"]
-        if prop == "email" and not validate_email(value):
-            status_code = status.HTTP_400_BAD_REQUEST
-            data = {"value": ["Given value is not an EMail ID!"]}
-
-        elif prop == "mobile" and not validate_mobile(value):
-            status_code = status.HTTP_400_BAD_REQUEST
-            data = {"value": ["Given value is not Mobile Number!"]}
-
-        elif check_unique(prop, value):
-            otpobj = generate_otp(prop, value)
-
-            sentotp = send_otp(
-                prop, value, otpobj, serialized_data.initial_data["email"]
-            )
-
-            data = {"unique": True, "OTP": sentotp["message"]}
-            if sentotp["success"]:
-                otpobj.send_counter += 1
-                otpobj.save()
-                status_code = status.HTTP_201_CREATED
-            else:
-                status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        else:
-            data = {"unique": False}
-            status_code = status.HTTP_409_CONFLICT
-        return data, status_code
-
-
-class VerifyOTP(ValidateAndPerformView):
-    """
-    This verifies an OTP against a value (email address or mobile). This process should be done before registering a
-    user with any email or mobile.
-    'value': A valid email address or mobile number which is to be validated.
-    'otp': The OTP sent at your email address.
-    """
-
-    serializer_class = serializers.OTPVerify
-
-    def validated(self, serialized_data, *args, **kwargs):
-        return validate_otp(serialized_data.data["value"], serialized_data.data["otp"])
+        user = serializer.validated_data["user"]
+        data, status_code = login_user(user, request)
+        return JsonResponse(data, status=status_code)
 
 
 class CheckUnique(ValidateAndPerformView):
@@ -414,7 +93,7 @@ class CheckUnique(ValidateAndPerformView):
     'value': Value against property which is to be checked for.
     """
 
-    serializer_class = serializers.CheckUniqueSerializer
+    serializer_class = CheckUniqueSerializer
 
     def validated(self, serialized_data, *args, **kwargs):
         return (
@@ -429,70 +108,57 @@ class CheckUnique(ValidateAndPerformView):
 
 
 class LoginOTP(ValidateAndPerformView):
-
-    serializer_class = serializers.OTPVerify
+    serializer_class = OTPVerify
 
     def validated(self, serialized_data, *args, **kwargs):
         otp = serialized_data.data["otp"]
         value = serialized_data.data["value"]
 
-        if value.isdigit() or value.startswith("+"):
-            prop = "mobile"
-            try:
-                user = User.objects.get(mobile=value)
-            except User.DoesNotExist:
-                user = None
-        else:
-            prop = "email"
-            try:
-                user = User.objects.get(email=value)
-            except User.DoesNotExist:
-                user = None
-
-        if user is None:
+        user = User.objects.filter(Q(mobile=value) | Q(email=value)).first()
+        if not user:
             data = {
                 "success": False,
                 "message": "No user exists with provided details!",
             }
             status_code = status.HTTP_404_NOT_FOUND
+            return data, status_code
 
-        elif otp is None:
+        if otp is None:
+            prop = (
+                OTPValidationType.EMAIL
+                if validate_email(value)
+                else OTPValidationType.MOBILE
+            )
             otp_obj = generate_otp(prop, value)
             data = send_otp(prop, value, otp_obj, user.email)
-
             status_code = (
                 status.HTTP_201_CREATED
                 if data["success"]
                 else status.HTTP_400_BAD_REQUEST
             )
 
-        else:
-            data, status_code = validate_otp(value, int(otp))
-            if status_code == status.HTTP_202_ACCEPTED:
-                data, status_code = login_user(user, self.request)
+            return data, status_code
+
+        data, status_code = validate_otp(value, int(otp))
+        if status_code == status.HTTP_202_ACCEPTED:
+            data, status_code = login_user(user, self.request)
 
         return data, status_code
 
 
 class ChangePassword(UpdateAPIView):
     """
-    This view will let the user to change the password.
+    This view will let the user change the password.
     """
-
-    from .models import User
-    from .serializers import ForgotPasswordSerializer
 
     queryset = User.objects.all()
     serializer_class = ForgotPasswordSerializer
 
     def update(self, request, *args, **kwargs):
-
-        from drfaddons.utils import JsonResponse
-
-        sdata = self.ForgotPasswordSerializer(data=request.data)
-        if not sdata.is_valid():
-            return JsonResponse(sdata.errors, status=status.HTTP_400_BAD_REQUEST)
-        request.user.set_password(sdata.data["new_password"])
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid(raise_exception=False):
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        request.user.set_password(serializer.validated_data["new_password"])
         request.user.save()
         return JsonResponse({"success": True}, status=status.HTTP_202_ACCEPTED)
 
@@ -502,18 +168,12 @@ class UpdateProfileView(UpdateAPIView):
     This view is to update a user profile.
     """
 
-    from .models import User
-    from .serializers import UpdateProfileSerializer
-
     queryset = User.objects.all()
     serializer_class = UpdateProfileSerializer
 
     def update(self, request, *args, **kwargs):
-
-        from drfaddons.utils import JsonResponse
-
-        serializer = self.UpdateProfileSerializer(request.user, data=request.data)
-        if not serializer.is_valid():
+        serializer = self.serializer_class(request.user, data=request.data)
+        if not serializer.is_valid(raise_exception=False):
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         try:
             self.perform_update(serializer)
@@ -521,8 +181,10 @@ class UpdateProfileView(UpdateAPIView):
             return JsonResponse(
                 serializer.validated_data, status=status.HTTP_202_ACCEPTED
             )
-        except IntegrityError:
-            raise ValidationError("This mobile number is already registered")
+        except IntegrityError as e:
+            raise ValidationError(
+                "Given mobile number or email is already registered."
+            ) from e
 
 
 class UserProfileView(ListAPIView):
@@ -536,12 +198,3 @@ class UserProfileView(ListAPIView):
 
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.pk)
-
-
-def about(request):
-    """
-    This function is used to set the about page.
-    """
-    from django.shortcuts import render
-
-    return render(request, "users/about.html")

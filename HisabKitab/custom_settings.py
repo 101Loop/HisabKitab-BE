@@ -45,6 +45,7 @@ CUSTOM_APPS = [
     "drf_contact",
     "users.apps.UsersConfig",
     "drf_transaction",
+    "core.apps.CoreConfig",
     "corsheaders",
     "drfaddons",
     "drf_yasg",
@@ -172,10 +173,12 @@ else:
         }
     }
 
+REDIS_URL = env.str("REDIS_URL")
+
 # HUEY
 HUEY = {
     "name": "HisabKitab",
-    "url": env.str("REDIS_URL"),
+    "url": REDIS_URL,
     "immediate": DEBUG,
     "utc": False,
     "consumer": {
@@ -196,3 +199,5 @@ Vitartha will also like to thank M/s Civil Machines Technologies Private Limited
 production & development of this app.
 Thank You!
 """
+
+ALLOWED_OTP_CHARACTERS = "0123456789"

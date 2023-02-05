@@ -1,6 +1,7 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import User
+User = get_user_model()
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -159,10 +160,14 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     mobile = serializers.CharField(required=False)
     name = serializers.CharField(required=False)
 
+    def validate(self, attrs):
+        if not attrs.get("email") and not attrs.get("mobile") and not attrs.get("name"):
+            raise serializers.ValidationError(
+                "Please provide at least one field to update."
+            )
+        return attrs
+
     class Meta:
-
-        from .models import User
-
         model = User
         fields = ("name", "email", "mobile")
 
@@ -173,8 +178,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-
-        from .models import User
-
         model = User
         fields = ("name", "email", "mobile")

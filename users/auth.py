@@ -46,9 +46,3 @@ class MultiFieldModelBackend(ModelBackend):
                 return user
         except self.user_model.DoesNotExist:
             return None
-
-    def get_user(self, username):
-        try:
-            return self.user_model.objects.get(pk=username)
-        except self.user_model.DoesNotExist:
-            return None
