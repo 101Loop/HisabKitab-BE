@@ -24,7 +24,6 @@ class ShowBankSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-
         model = BankMaster
         fields = ("name", "bank_aliases")
 

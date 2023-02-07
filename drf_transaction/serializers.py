@@ -38,7 +38,6 @@ class AddTransactionDetailsSerializer(serializers.ModelSerializer):
     contact = serializers.CharField(required=True, max_length=254)
 
     class Meta:
-
         model = TransactionDetail
         fields = (
             "category",
