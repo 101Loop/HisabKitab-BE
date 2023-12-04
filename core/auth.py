@@ -72,10 +72,7 @@ class JSONWebTokenAuthenticationQS(BaseJSONWebTokenAuthentication):
         auth_header_prefix = self.prefix.lower() or ""
 
         if not auth:
-            if self.cookie:
-                return request.COOKIES.get(self.cookie)
-            return None
-
+            return request.COOKIES.get(self.cookie) if self.cookie else None
         if auth_header_prefix is None or len(auth_header_prefix) < 1:
             auth.append("")
             auth.reverse()
