@@ -11,6 +11,14 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 import os
 
+import django
+from django.utils.encoding import smart_str
+
+django.utils.encoding.smart_text = smart_str
+from django.utils.translation import gettext
+
+django.utils.translation.ugettext = gettext
+
 from .custom_settings import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -22,8 +30,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Application definition
 
 INSTALLED_APPS = [
-    "jet.dashboard",
-    "jet",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -88,4 +94,4 @@ LANGUAGE_CODE = "en-us"
 
 USE_I18N = True
 
-USE_L10N = True
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
