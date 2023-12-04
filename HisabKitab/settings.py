@@ -22,8 +22,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Application definition
 
 INSTALLED_APPS = [
-    "jet.dashboard",
-    "jet",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -88,4 +86,4 @@ LANGUAGE_CODE = "en-us"
 
 USE_I18N = True
 
-USE_L10N = True
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

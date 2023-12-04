@@ -43,17 +43,13 @@ urlpatterns = [
         schema_view.without_ui(cache_timeout=None),
         name="schema-json",
     ),
-    re_path(
-        "swagger/$",
+    path(
+        "swagger/",
         schema_view.with_ui("swagger", cache_timeout=None),
         name="schema-swagger-ui",
     ),
-    re_path(
-        "redoc/$", schema_view.with_ui("redoc", cache_timeout=None), name="schema-redoc"
-    ),
-    path("jet/", include("jet.urls", "jet")),  # Django JET URLSz
     path(
-        "jet/dashboard/", include("jet.dashboard.urls", "jet-dashboard")
-    ),  # Django JET dashboard URLS
+        "redoc/", schema_view.with_ui("redoc", cache_timeout=None), name="schema-redoc"
+    ),
     path("", admin.site.urls),
 ]

@@ -71,7 +71,7 @@ AUTHENTICATION_BACKENDS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_AUTHENTICATION_CLASSES": ("drfaddons.auth.JSONWebTokenAuthenticationQS",),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("core.auth.JSONWebTokenAuthenticationQS",),
     "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -121,15 +121,6 @@ TIME_ZONE = "Asia/Kolkata"
 STATIC_URL = "/static/"
 
 STATIC_ROOT = "static"
-
-JET_THEMES = [
-    {"theme": "default", "color": "#47bac1", "title": "Default"},
-    {"theme": "green", "color": "#44b78b", "title": "Green"},
-    {"theme": "light-green", "color": "#2faa60", "title": "Light Green"},
-    {"theme": "light-violet", "color": "#a464c4", "title": "Light Violet"},
-    {"theme": "light-blue", "color": "#5EADDE", "title": "Light Blue"},
-    {"theme": "light-gray", "color": "#222", "title": "Light Gray"},
-]
 
 # Sentry
 # ------------------------------------------------------------------------------
