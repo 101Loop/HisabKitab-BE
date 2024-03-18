@@ -170,9 +170,9 @@ def validate_otp(value, otp):
             data["OTP"] = "Attempt exceeded! OTP has been reset!"
         else:
             otp_object.save()
-            data[
-                "OTP"
-            ] = f"OTP Validation failed! {otp_object.validate_attempt} attempts left!"
+            data["OTP"] = (
+                f"OTP Validation failed! {otp_object.validate_attempt} attempts left!"
+            )
             status_code = status.HTTP_401_UNAUTHORIZED
     except OTPValidation.DoesNotExist:
         # If OTP object doesn't exist set proper message and status_code
@@ -205,9 +205,9 @@ def send_otp(prop: str, value: str, otpobj: OTPValidation, recip: str) -> dict:
     rdata = {"success": False, "message": None}
 
     if otpobj.reactive_at > datetime.datetime.now():
-        rdata[
-            "message"
-        ] = f"OTP sending not allowed until: {otpobj.reactive_at.strftime('%d-%h-%Y %H:%M:%S')}"
+        rdata["message"] = (
+            f"OTP sending not allowed until: {otpobj.reactive_at.strftime('%d-%h-%Y %H:%M:%S')}"
+        )
         return rdata
 
     message = (
