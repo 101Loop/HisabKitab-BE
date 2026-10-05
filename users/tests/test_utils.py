@@ -1,4 +1,5 @@
 """Tests for drf_user/utils.py module"""
+
 import datetime
 from unittest.mock import ANY, MagicMock, patch
 
